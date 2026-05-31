@@ -1,0 +1,285 @@
+@import "tailwindcss";
+
+/* ============================================
+   DESIGN TOKENS — Custom Properties
+   ============================================ */
+@theme {
+  /* Colours */
+  --color-bg: #0f1117;
+  --color-surface: #1a1d27;
+  --color-surface-elevated: #22263a;
+  --color-surface-hover: #2a2f45;
+  --color-primary: #4f8ef7;
+  --color-primary-dim: #3a6fd4;
+  --color-danger: #e05c5c;
+  --color-danger-dim: #c24444;
+  --color-success: #4caf82;
+  --color-success-dim: #3a9068;
+  --color-warning: #e8a838;
+  --color-warning-dim: #c88f2a;
+  --color-text-primary: #e8eaf0;
+  --color-text-secondary: #8b90a4;
+  --color-border: #2e3248;
+  --color-border-light: #3a3f58;
+
+  /* Chart colours */
+  --color-chart-kaggle: #4f8ef7;
+  --color-chart-nhanes: #7eb3ff;
+  --color-chart-kaggle-alt: #6366f1;
+  --color-chart-nhanes-alt: #a5b4fc;
+
+  /* Typography */
+  --font-heading: 'DM Sans', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+code, .mono {
+  font-family: var(--font-mono);
+}
+
+/* Selection colour */
+::selection {
+  background-color: rgba(79, 142, 247, 0.3);
+  color: var(--color-text-primary);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.section-label {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Research table styling */
+.research-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.research-table thead th {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.research-table tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.research-table tbody td:first-child {
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.research-table tbody tr:hover {
+  background-color: var(--color-surface-elevated);
+}
+
+.research-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Card base */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.card:hover {
+  background-color: var(--color-surface-elevated);
+}
+
+/* Callout */
+.callout {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid;
+  border-radius: 0 8px 8px 0;
+  padding: 1.25rem 1.5rem;
+}
+
+.callout-danger {
+  border-left-color: var(--color-danger);
+}
+
+.callout-primary {
+  border-left-color: var(--color-primary);
+}
+
+.callout-warning {
+  border-left-color: var(--color-warning);
+}
+
+/* Horizontal scroll wrapper for tables on mobile */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes countUp {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Recharts overrides for consistent styling */
+.recharts-cartesian-axis-tick-value {
+  fill: var(--color-text-secondary) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.75rem !important;
+}
+
+.recharts-legend-item-text {
+  color: var(--color-text-secondary) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.8rem !important;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+/* ============================================
+   GLASSMORPHISM UTILITIES
+   ============================================ */
+
+.glass {
+  background: rgba(26, 29, 39, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Smooth GPU-accelerated parallax */
+[data-parallax] {
+  will-change: transform;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* KaTeX theme overrides — match dark palette */
+.katex {
+  color: var(--color-text-primary) !important;
+  font-size: 1.1em !important;
+}
+
+.katex .mord,
+.katex .mop,
+.katex .mrel,
+.katex .mbin,
+.katex .mpunct {
+  color: var(--color-text-primary) !important;
+}
+
+.katex .mord.text {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Algorithm / pseudocode code blocks */
+pre code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: #c5c8d6;
+}
+
+/* Keyword highlighting in pseudocode */
+pre code .kw { color: #7eb3ff; }
+pre code .cm { color: #8b90a4; font-style: italic; }
+
+/* Smooth section transitions */
+section {
+  transition: background-color 0.3s ease;
+}

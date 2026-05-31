@@ -1,0 +1,13 @@
+# Python/Jupyter
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+__pycache__/
+*.pyc
+
+# OS/System
+.DS_Store
+Thumbs.db
+
+# Subprojects
+website/node_modules
+website/dist
