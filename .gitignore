@@ -8,6 +8,10 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Manuscript Drafts (Keep private)
+V4 stroke_MJS_manuscript.docx
+manuscript_text.txt
+
 # Subprojects
 website/node_modules
 website/dist
