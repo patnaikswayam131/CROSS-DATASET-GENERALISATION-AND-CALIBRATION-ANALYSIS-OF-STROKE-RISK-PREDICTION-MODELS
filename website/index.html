@@ -718,18 +718,20 @@
       flex-shrink: 0;
     }
     .snippet button:hover { color: var(--ink); border-color: var(--ink); }
+    .snippet button:hover { color: var(--ink); background: none; border-color: var(--ink); }
 
     /* ================================================================
        CODE / PSEUDOCODE BLOCK
     ================================================================ */
     .code-block {
-      background: var(--ink);
+      background: var(--surface-dark);
       border-radius: var(--r-sm);
       overflow: hidden;
       margin: var(--s-xl) 0;
     }
     .code-block-header {
-      background: var(--charcoal);
+      background: var(--surface-dark-elevated);
+      color: var(--on-dark);
       padding: 10px 16px;
       display: flex;
       align-items: center;
@@ -868,7 +870,7 @@
       display: inline-block;
       font-size: 13px;
       font-weight: 500;
-      color: var(--on-dark);
+      color: var(--canvas);
       background: var(--ink);
       border-radius: var(--r-sm);
       padding: 2px 8px;
@@ -935,8 +937,8 @@
       display: inline-block;
       font-size: 13px;
       font-weight: 700;
-      color: var(--ink);
-      background: var(--surface-card);
+      color: var(--canvas);
+      background: var(--ink);
       border-radius: var(--r-sm);
       padding: 1px 8px;
       margin-bottom: var(--s-sm);
@@ -996,7 +998,7 @@
       display: inline-block;
       font-size: 13px;
       font-weight: 700;
-      color: var(--on-dark);
+      color: var(--canvas);
       background: var(--ink);
       border-radius: var(--r-sm);
       padding: 2px 8px;
@@ -1147,7 +1149,7 @@
       width: 48px;
       height: 48px;
       background: var(--ink);
-      color: var(--on-dark);
+      color: var(--canvas);
       border-radius: 9999px;
       display: flex;
       align-items: center;
@@ -1828,6 +1830,37 @@
 
     <!-- Tab: Ablation -->
     <div class="tab-panel" id="tab-ablation" role="tabpanel" aria-labelledby="btn-ablation">
+      
+      <!-- NEW: ASCII Visualization -->
+      <div class="code-block" style="padding:20px; font-size:14px; line-height:1.8; margin-top:0;">
+        <div style="color:var(--on-dark-mute); margin-bottom:12px; font-weight:700;">[+] Ablation Impact on ROC-AUC (Δ)</div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">Full Model</span>
+          <span style="flex-grow:1; color:var(--on-dark-mute);">[========================================]</span>
+          <span style="width:120px; text-align:right;">0.808</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">w/o bmi</span>
+          <span style="flex-grow:1; color:var(--on-dark-mute);">[======================================= ]</span>
+          <span style="width:120px; text-align:right;">0.805 <span style="color:var(--danger);">(-0.003)</span></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">w/o gender</span>
+          <span style="flex-grow:1; color:var(--on-dark-mute);">[======================================  ]</span>
+          <span style="width:120px; text-align:right;">0.793 <span style="color:var(--danger);">(-0.015)</span></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">w/o glucose</span>
+          <span style="flex-grow:1; color:var(--on-dark-mute);">[======================================  ]</span>
+          <span style="width:120px; text-align:right;">0.780 <span style="color:var(--danger);">(-0.028)</span></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">w/o age</span>
+          <span style="flex-grow:1; color:var(--on-dark-mute);">[========================                ]</span>
+          <span style="width:120px; text-align:right;">0.602 <span style="color:var(--danger);">(-0.206)</span></span>
+        </div>
+      </div>
+
       <div class="table-scroll mb-xl">
         <table class="data-table">
           <thead>
@@ -1880,11 +1913,30 @@
     <!-- Tab: Concept Shift and Calibration -->
     <div class="tab-panel" id="tab-concept" role="tabpanel" aria-labelledby="btn-concept">
       <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Feature Patching -- ROC-AUC Delta</p>
-      <div class="bar-chart mb-md">
-        <div class="bar-group"><span class="bar-label">age</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:100%; opacity:1;"></div></div><span class="bar-val" style="color:var(--danger);">-0.200</span></div>
-        <div class="bar-group"><span class="bar-label">bmi</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:10.5%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.021</span></div>
-        <div class="bar-group"><span class="bar-label">avg_glucose_level</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:8%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.016</span></div>
-        <div class="bar-group"><span class="bar-label">gender</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:0.5%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.001</span></div>
+      
+      <!-- NEW: ASCII Diverging Chart -->
+      <div class="code-block" style="padding:20px; font-size:14px; line-height:1.8; margin-top:0; margin-bottom:24px;">
+        <div style="color:var(--on-dark-mute); margin-bottom:12px; font-weight:700;">[!] Feature Patching (δ) - Concurrent Concept Shift</div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">age</span>
+          <span style="flex-grow:1; color:var(--danger);">[--------------------|                    ]</span>
+          <span style="width:80px; text-align:right; color:var(--danger);">-0.200</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">bmi</span>
+          <span style="flex-grow:1; color:var(--danger);">[--|                                      ]</span>
+          <span style="width:80px; text-align:right; color:var(--danger);">-0.021</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">avg_glucose</span>
+          <span style="flex-grow:1; color:var(--danger);">[-|                                       ]</span>
+          <span style="width:80px; text-align:right; color:var(--danger);">-0.016</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; color:var(--on-dark);">
+          <span style="width:140px;">gender</span>
+          <span style="flex-grow:1; color:var(--danger);">[|                                        ]</span>
+          <span style="width:80px; text-align:right; color:var(--danger);">-0.001</span>
+        </div>
       </div>
       <p class="callout danger mb-xxl">
         [!] All feature-patching deltas are negative. Correcting covariate shift in every feature WORSENS cross-domain performance, confirming concurrent concept shift: P_S(Y|X) is not equal to P_T(Y|X).
