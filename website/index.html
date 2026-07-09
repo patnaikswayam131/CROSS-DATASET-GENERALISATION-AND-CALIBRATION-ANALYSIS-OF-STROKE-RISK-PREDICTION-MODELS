@@ -25,7 +25,7 @@
       --font: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'SFMono-Regular',
               Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
-      /* Color tokens */
+      /* Light mode color tokens */
       --ink:          #201d1d;
       --ink-deep:     #0f0000;
       --charcoal:     #302c2c;
@@ -59,7 +59,202 @@
 
       /* Radius */
       --r-sm: 4px;
+
+      /* Progress bar */
+      --progress: 0%;
     }
+
+    /* ================================================================
+       DARK MODE TOKENS
+    ================================================================ */
+    [data-theme="dark"] {
+      --ink:          #e8e5e5;
+      --ink-deep:     #ffffff;
+      --charcoal:     #c8c4c4;
+      --body:         #a8a5a5;
+      --mute:         #7a7878;
+      --stone:        #6a6a6e;
+      --ash:          #5a5858;
+      --canvas:       #0f0d0d;
+      --surface-soft: #161414;
+      --surface-card: #1e1b1b;
+      --surface-dark: #080707;
+      --surface-dark-elevated: #1e1b1b;
+      --hairline:     rgba(255,255,255,0.08);
+      --hairline-strong: #3a3838;
+      --on-dark:      #e8e5e5;
+      --on-dark-mute: #7a7878;
+      --danger:       #ff6b62;
+      --warning:      #ffb84d;
+      --success:      #4de87a;
+    }
+
+    /* ================================================================
+       READING PROGRESS BAR
+    ================================================================ */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--progress);
+      height: 2px;
+      background: var(--ink);
+      z-index: 200;
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+
+    /* ================================================================
+       COMMAND PALETTE
+    ================================================================ */
+    #cmd-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 300;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 80px;
+    }
+    #cmd-overlay.open { display: flex; }
+    #cmd-box {
+      background: var(--canvas);
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--r-sm);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    #cmd-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    #cmd-prompt { font-weight: 700; color: var(--ink); flex-shrink: 0; }
+    #cmd-input {
+      font-family: var(--font);
+      font-size: 16px;
+      color: var(--ink);
+      background: none;
+      border: none;
+      outline: none;
+      width: 100%;
+      caret-color: var(--ink);
+    }
+    #cmd-input::placeholder { color: var(--ash); }
+    #cmd-results { max-height: 300px; overflow-y: auto; }
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-size: 15px;
+      color: var(--body);
+      border-bottom: 1px solid var(--hairline);
+      transition: background 0.1s;
+    }
+    .cmd-item:last-child { border-bottom: none; }
+    .cmd-item:hover, .cmd-item.selected {
+      background: var(--surface-soft);
+      color: var(--ink);
+    }
+    .cmd-item .cmd-marker { color: var(--ink); font-weight: 700; min-width: 24px; }
+    .cmd-item .cmd-section-name { font-weight: 500; }
+    #cmd-hint {
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--ash);
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      gap: 16px;
+    }
+    #cmd-hint kbd {
+      font-family: var(--font);
+      background: var(--surface-card);
+      border-radius: 2px;
+      padding: 1px 5px;
+      font-size: 12px;
+      color: var(--mute);
+    }
+
+    /* ================================================================
+       TYPING CURSOR
+    ================================================================ */
+    .cursor {
+      display: inline-block;
+      width: 9px;
+      height: 14px;
+      background: var(--on-dark-mute);
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ================================================================
+       SECTION REVEAL ANIMATION
+    ================================================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ================================================================
+       DARK MODE TOGGLE BUTTON
+    ================================================================ */
+    #dark-toggle {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mute);
+      background: none;
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-sm);
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    #dark-toggle:hover { color: var(--ink); border-color: var(--hairline-strong); }
+
+    /* ================================================================
+       CITATION FORMAT SWITCHER
+    ================================================================ */
+    .cite-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--hairline-strong);
+      margin-bottom: var(--s-lg);
+      overflow-x: auto;
+    }
+    .cite-tab {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--mute);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      padding: 6px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    .cite-tab:hover { color: var(--ink); }
+    .cite-tab.active { color: var(--ink); border-bottom-color: var(--ash); }
+    .cite-content { display: none; }
+    .cite-content.active { display: block; }
 
     /* ================================================================
        RESET & BASE
@@ -113,7 +308,7 @@
     ================================================================ */
     #primary-nav {
       position: sticky;
-      top: 0;
+      top: 2px;
       z-index: 100;
       height: 56px;
       background: var(--canvas);
@@ -1088,9 +1283,28 @@
 <!-- ================================================================
      PRIMARY NAV
 ================================================================ -->
+<!-- Reading progress bar -->
+<div id="progress-bar" aria-hidden="true"></div>
+
+<!-- Command palette overlay -->
+<div id="cmd-overlay" role="dialog" aria-modal="true" aria-label="Quick navigation" onclick="closeCmdPalette(event)">
+  <div id="cmd-box">
+    <div id="cmd-input-row">
+      <span id="cmd-prompt">>&nbsp;</span>
+      <input id="cmd-input" type="text" placeholder="Jump to section..." autocomplete="off" oninput="filterCmd()" onkeydown="cmdKey(event)" />
+    </div>
+    <div id="cmd-results"></div>
+    <div id="cmd-hint">
+      <span><kbd>Enter</kbd> jump</span>
+      <span><kbd>Esc</kbd> close</span>
+      <span><kbd>j/k</kbd> navigate</span>
+    </div>
+  </div>
+</div>
+
 <nav id="primary-nav" role="navigation" aria-label="Primary navigation">
   <div class="nav-inner">
-    <a href="#hero" class="nav-wordmark">[SP] Stroke Generalisation</a>
+    <a href="#hero" class="nav-wordmark" id="nav-wordmark">[SP] Stroke Generalisation</a>
     <div class="nav-links">
       <a href="#problem">Problem</a>
       <a href="#literature">Literature</a>
@@ -1104,7 +1318,11 @@
       <a href="#conclusion">Conclusion</a>
       <a href="#about">Cite</a>
     </div>
-    <a href="https://github.com/patnaikswayam131/CROSS-DATASET-GENERALISATION-AND-CALIBRATION-ANALYSIS-OF-STROKE-RISK-PREDICTION-MODELS" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a>
+    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+      <button id="dark-toggle" onclick="toggleDark()" aria-label="Toggle dark mode" title="Toggle dark mode (D)">[D]</button>
+      <button class="nav-cta" onclick="openCmdPalette()" title="Quick jump (Ctrl+K)" style="cursor:pointer; font-size:13px;">Ctrl+K</button>
+      <a href="https://github.com/patnaikswayam131/CROSS-DATASET-GENERALISATION-AND-CALIBRATION-ANALYSIS-OF-STROKE-RISK-PREDICTION-MODELS" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a>
+    </div>
   </div>
 </nav>
 
@@ -1132,17 +1350,15 @@
       <!-- Subheadline -->
       <p class="hero-sub">What happens when clinical AI meets a population it has never seen? Three classifiers trained on Kaggle, evaluated zero-shot on NHANES 2021-2023.</p>
 
-      <!-- Prompt row -->
+      <!-- Prompt row with typing animation -->
       <div class="tui-prompt-row">
         <span class="pipe">|</span>
         <span class="cmd">evaluate</span>
-        <span class="token">kaggle -> nhanes</span>
-        <span class="token">no-retraining</span>
-        <span class="token">N=8,276</span>
+        <span id="typing-target" style="color:var(--on-dark-mute);"></span><span class="cursor" id="typing-cursor"></span>
       </div>
 
       <!-- Stat pills -->
-      <div class="hero-stat-row">
+      <div class="hero-stat-row" style="margin-top: var(--s-lg);">
         <span class="hero-stat-pill danger">[!] 51-63% PR-AUC Collapse</span>
         <span class="hero-stat-pill primary">[+] 3 Classifiers Evaluated</span>
         <span class="hero-stat-pill">[+] 2 Independent Datasets</span>
@@ -1168,11 +1384,11 @@
   <div class="hero-stats-strip">
     <div class="stats-inner">
       <div class="stat-box">
-        <span class="stat-val">63%</span>
+        <span class="stat-val" data-count-to="63" data-suffix="%">0%</span>
         <span class="stat-lbl">Maximum PR-AUC Collapse (LR)</span>
       </div>
       <div class="stat-box">
-        <span class="stat-val">0.709</span>
+        <span class="stat-val" data-count-to="0.709" data-decimals="3">0.000</span>
         <span class="stat-lbl">Best Cross-Domain ROC-AUC (RF 0.725)</span>
       </div>
       <div class="stat-box">
@@ -1180,7 +1396,7 @@
         <span class="stat-lbl">Glucose Distribution Shift (Severe)</span>
       </div>
       <div class="stat-box">
-        <span class="stat-val">-0.130</span>
+        <span class="stat-val" data-count-to="0.130" data-prefix="-" data-decimals="3">-0.000</span>
         <span class="stat-lbl">XGBoost Isotonic Regression Collapse</span>
       </div>
     </div>
@@ -2271,28 +2487,63 @@ Return:
       </div>
     </div>
 
-    <p class="section-label" style="font-size:14px; margin-bottom:var(--s-sm);">BibTeX Citation</p>
-    <div class="snippet mb-md">
-      <code>@article{patnaik2025stroke ...}</code>
-      <button onclick="copyBibtex(this)">Copy BibTeX</button>
+    <p class="section-label" style="font-size:14px; margin-bottom:var(--s-sm);">Citation</p>
+
+    <!-- Citation format tabs -->
+    <div class="cite-tabs" role="tablist">
+      <button class="cite-tab active" onclick="switchCite('bibtex')" role="tab">BibTeX</button>
+      <button class="cite-tab" onclick="switchCite('apa')" role="tab">APA</button>
+      <button class="cite-tab" onclick="switchCite('mla')" role="tab">MLA</button>
+      <button class="cite-tab" onclick="switchCite('ieee')" role="tab">IEEE</button>
     </div>
-    <div class="bibtex-block" id="bibtex-full">@article{patnaik2025stroke,
+
+    <div class="cite-content active" id="cite-bibtex">
+      <div class="snippet mb-sm">
+        <code>@article{patnaik2025stroke ...}</code>
+        <button onclick="copyCite('cite-bibtex-full', this)">Copy</button>
+      </div>
+      <div class="bibtex-block" id="cite-bibtex-full">@article{patnaik2025stroke,
   title     = {Cross-Dataset Generalisation and Calibration Analysis
                of Stroke Risk Prediction Models},
   author    = {Patnaik, Swayam},
   year      = {2025},
   note      = {Preprint -- not yet published},
   institution = {NIST University, Berhampur, India},
-  abstract  = {This study evaluates cross-domain generalisation failure
-               of three stroke risk classifiers trained on Kaggle and
-               evaluated zero-shot on NHANES 2021-2023. PR-AUC collapsed
-               51-63% under domain shift. Feature-patching confirmed
-               concurrent concept shift. Post-hoc calibration provided
-               no recovery.},
   keywords  = {stroke prediction, dataset shift, generalisation,
                calibration, PR-AUC, covariate shift, concept shift,
                machine learning, clinical AI}
 }</div>
+    </div>
+
+    <div class="cite-content" id="cite-apa">
+      <div class="snippet mb-sm">
+        <code>Patnaik, S. (2025). Cross-Dataset Generalisation...</code>
+        <button onclick="copyCite('cite-apa-full', this)">Copy</button>
+      </div>
+      <div class="bibtex-block" id="cite-apa-full">Patnaik, S. (2025). Cross-Dataset Generalisation and Calibration
+Analysis of Stroke Risk Prediction Models. NIST University,
+Berhampur, India. (Preprint -- not yet published.)</div>
+    </div>
+
+    <div class="cite-content" id="cite-mla">
+      <div class="snippet mb-sm">
+        <code>Patnaik, Swayam. "Cross-Dataset Generalisation..."</code>
+        <button onclick="copyCite('cite-mla-full', this)">Copy</button>
+      </div>
+      <div class="bibtex-block" id="cite-mla-full">Patnaik, Swayam. "Cross-Dataset Generalisation and Calibration
+Analysis of Stroke Risk Prediction Models." NIST University,
+Berhampur, 2025. Preprint.</div>
+    </div>
+
+    <div class="cite-content" id="cite-ieee">
+      <div class="snippet mb-sm">
+        <code>S. Patnaik, "Cross-Dataset Generalisation..."</code>
+        <button onclick="copyCite('cite-ieee-full', this)">Copy</button>
+      </div>
+      <div class="bibtex-block" id="cite-ieee-full">S. Patnaik, "Cross-Dataset Generalisation and Calibration Analysis
+of Stroke Risk Prediction Models," NIST University, Berhampur,
+India, 2025. [Preprint, not yet published.]</div>
+    </div>
 
     <div class="mt-xxl">
       <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Links</p>
@@ -2322,7 +2573,7 @@ Return:
     </div>
     <div class="footer-bottom">
       <span>Swayam Patnaik -- NIST University, Berhampur, India -- 2025</span>
-      <span style="color:var(--ash);">Cross-Dataset Generalisation and Calibration Analysis of Stroke Risk Prediction Models</span>
+      <span style="color:var(--ash);"><kbd style="font-family:var(--font);background:var(--surface-card);border-radius:2px;padding:1px 5px;font-size:12px;">j/k</kbd> navigate &nbsp; <kbd style="font-family:var(--font);background:var(--surface-card);border-radius:2px;padding:1px 5px;font-size:12px;">Ctrl+K</kbd> jump &nbsp; <kbd style="font-family:var(--font);background:var(--surface-card);border-radius:2px;padding:1px 5px;font-size:12px;">D</kbd> dark mode</span>
     </div>
   </div>
 </footer>
@@ -2331,7 +2582,9 @@ Return:
      JAVASCRIPT
 ================================================================ -->
 <script>
-  /* ---- Tab switching ---- */
+  /* ================================================================
+     TAB SWITCHING
+  ================================================================ */
   function switchTab(id) {
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.id === 'btn-' + id);
@@ -2342,7 +2595,9 @@ Return:
     });
   }
 
-  /* ---- FAQ accordion ---- */
+  /* ================================================================
+     FAQ ACCORDION
+  ================================================================ */
   function toggleFaq(btn) {
     const body = btn.nextElementSibling;
     const marker = btn.querySelector('.marker');
@@ -2352,7 +2607,9 @@ Return:
     btn.setAttribute('aria-expanded', !isOpen);
   }
 
-  /* ---- Copy code ---- */
+  /* ================================================================
+     COPY CODE
+  ================================================================ */
   function copyCode(id, btn) {
     const text = document.getElementById(id).textContent;
     navigator.clipboard.writeText(text).then(() => {
@@ -2362,16 +2619,290 @@ Return:
     });
   }
 
-  /* ---- Copy BibTeX ---- */
-  function copyBibtex(btn) {
-    const text = document.getElementById('bibtex-full').textContent;
+  function copyCite(id, btn) {
+    const text = document.getElementById(id).textContent;
     navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
       btn.textContent = 'Copied!';
-      setTimeout(() => { btn.textContent = 'Copy BibTeX'; }, 2000);
+      setTimeout(() => { btn.textContent = orig; }, 2000);
     });
   }
 
-  /* ---- Interactive Explorer ---- */
+  /* ================================================================
+     CITATION FORMAT SWITCHER
+  ================================================================ */
+  function switchCite(fmt) {
+    document.querySelectorAll('.cite-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.cite-content').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('cite-' + fmt).classList.add('active');
+  }
+
+  /* ================================================================
+     DARK MODE
+  ================================================================ */
+  const html = document.documentElement;
+  const darkToggleBtn = document.getElementById('dark-toggle');
+
+  function applyTheme(dark) {
+    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+    if (darkToggleBtn) darkToggleBtn.textContent = dark ? '[L]' : '[D]';
+    try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch(e) {}
+  }
+
+  function toggleDark() {
+    applyTheme(html.getAttribute('data-theme') !== 'dark');
+  }
+
+  // On load: respect saved preference or system preference
+  (function() {
+    let saved;
+    try { saved = localStorage.getItem('theme'); } catch(e) {}
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved === 'dark' || (!saved && prefersDark));
+  })();
+
+  /* ================================================================
+     READING PROGRESS BAR
+  ================================================================ */
+  function updateProgress() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0;
+    document.documentElement.style.setProperty('--progress', pct + '%');
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  /* ================================================================
+     TYPING ANIMATION
+  ================================================================ */
+  (function() {
+    const target = document.getElementById('typing-target');
+    const cursor = document.getElementById('typing-cursor');
+    if (!target) return;
+    const text = ' kaggle -> nhanes  --no-retrain  N=8,276';
+    let i = 0;
+    function type() {
+      if (i <= text.length) {
+        target.textContent = text.slice(0, i);
+        i++;
+        setTimeout(type, i < 10 ? 80 : 55);
+      } else {
+        // After typing, hide cursor after 3s
+        setTimeout(() => { if(cursor) cursor.style.display = 'none'; }, 3000);
+      }
+    }
+    setTimeout(type, 600); // slight delay before starting
+  })();
+
+  /* ================================================================
+     ANIMATED NUMBER COUNTERS
+  ================================================================ */
+  function animateCounter(el) {
+    const to      = parseFloat(el.dataset.countTo);
+    const dec     = parseInt(el.dataset.decimals || '0', 10);
+    const prefix  = el.dataset.prefix || '';
+    const suffix  = el.dataset.suffix || '';
+    const dur     = 1200;
+    const start   = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      const val = to * ease;
+      el.textContent = prefix + val.toFixed(dec) + suffix;
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !e.target.dataset.counted) {
+        e.target.dataset.counted = '1';
+        animateCounter(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-count-to]').forEach(el => counterObserver.observe(el));
+
+  /* ================================================================
+     SECTION REVEAL ON SCROLL
+  ================================================================ */
+  document.querySelectorAll('section').forEach(s => s.classList.add('reveal'));
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* ================================================================
+     COMMAND PALETTE
+  ================================================================ */
+  const SECTIONS = [
+    { id: 'hero',        label: 'Hero -- Research Overview' },
+    { id: 'problem',     label: 'Problem Statement -- The Benchmark Illusion' },
+    { id: 'literature',  label: 'Literature Review -- Prior Studies' },
+    { id: 'gaps',        label: 'Research Gaps -- What Remains Unaddressed' },
+    { id: 'datasets',    label: 'Data -- Source and Target Domains' },
+    { id: 'results',     label: 'Results -- Performance Under Domain Shift' },
+    { id: 'explorer',    label: 'Interactive Explorer -- Model x Metric' },
+    { id: 'methodology', label: 'Methodology -- Experimental Protocol' },
+    { id: 'math',        label: 'Mathematical Formulation -- Formal Definitions' },
+    { id: 'algorithms',  label: 'Algorithms -- Pipeline Pseudocode' },
+    { id: 'comparative', label: 'Comparative Analysis -- This Study vs. Prior Work' },
+    { id: 'conclusion',  label: 'Conclusion and Future Work' },
+    { id: 'about',       label: 'About -- Author and Citation' },
+  ];
+
+  let cmdSelected = 0;
+  let cmdFiltered = [...SECTIONS];
+
+  function renderCmdResults(items) {
+    const box = document.getElementById('cmd-results');
+    box.innerHTML = items.map((s, i) =>
+      `<div class="cmd-item${i === cmdSelected ? ' selected' : ''}" onclick="jumpTo('${s.id}')">
+        <span class="cmd-marker">[${i + 1 < 10 ? i + 1 : '*'}]</span>
+        <span class="cmd-section-name">${s.label}</span>
+       </div>`
+    ).join('');
+  }
+
+  function filterCmd() {
+    const q = document.getElementById('cmd-input').value.toLowerCase();
+    cmdFiltered = SECTIONS.filter(s =>
+      s.label.toLowerCase().includes(q) || s.id.includes(q)
+    );
+    cmdSelected = 0;
+    renderCmdResults(cmdFiltered);
+  }
+
+  function cmdKey(e) {
+    if (e.key === 'Escape') { closeCmdPalette(); return; }
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      e.preventDefault();
+      cmdSelected = Math.min(cmdSelected + 1, cmdFiltered.length - 1);
+      renderCmdResults(cmdFiltered);
+    }
+    if (e.key === 'ArrowUp' || e.key === 'k') {
+      e.preventDefault();
+      cmdSelected = Math.max(cmdSelected - 1, 0);
+      renderCmdResults(cmdFiltered);
+    }
+    if (e.key === 'Enter') {
+      if (cmdFiltered[cmdSelected]) jumpTo(cmdFiltered[cmdSelected].id);
+    }
+  }
+
+  function openCmdPalette() {
+    const overlay = document.getElementById('cmd-overlay');
+    const input   = document.getElementById('cmd-input');
+    overlay.classList.add('open');
+    input.value = '';
+    cmdFiltered = [...SECTIONS];
+    cmdSelected = 0;
+    renderCmdResults(cmdFiltered);
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function closeCmdPalette(e) {
+    if (!e || e.target === document.getElementById('cmd-overlay')) {
+      document.getElementById('cmd-overlay').classList.remove('open');
+    }
+  }
+
+  function jumpTo(id) {
+    document.getElementById('cmd-overlay').classList.remove('open');
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ================================================================
+     KEYBOARD NAVIGATION (j/k for sections, D for dark mode, Ctrl+K palette)
+  ================================================================ */
+  const SECTION_IDS = ['hero','problem','literature','gaps','datasets','results',
+                       'explorer','methodology','math','algorithms','comparative',
+                       'conclusion','about'];
+
+  function currentSectionIndex() {
+    let best = 0;
+    SECTION_IDS.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= 80) best = i;
+    });
+    return best;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    // Don't fire when typing in an input
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    // Ctrl+K -- open palette
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      openCmdPalette();
+      return;
+    }
+    // D -- toggle dark mode
+    if (e.key === 'd' || e.key === 'D') {
+      if (!document.getElementById('cmd-overlay').classList.contains('open')) toggleDark();
+      return;
+    }
+    // j -- next section
+    if (e.key === 'j' && !e.ctrlKey) {
+      const next = Math.min(currentSectionIndex() + 1, SECTION_IDS.length - 1);
+      jumpTo(SECTION_IDS[next]);
+      return;
+    }
+    // k -- prev section
+    if (e.key === 'k' && !e.ctrlKey) {
+      const prev = Math.max(currentSectionIndex() - 1, 0);
+      jumpTo(SECTION_IDS[prev]);
+      return;
+    }
+    // Esc -- close palette
+    if (e.key === 'Escape') {
+      document.getElementById('cmd-overlay').classList.remove('open');
+    }
+  });
+
+  /* ================================================================
+     ACTIVE NAV HIGHLIGHTING
+  ================================================================ */
+  const navWordmark = document.getElementById('nav-wordmark');
+  const SECTION_LABELS = {
+    hero: '[SP] Stroke Generalisation',
+    problem: '[1] Problem',
+    literature: '[2] Literature',
+    gaps: '[3] Gaps',
+    datasets: '[4] Data',
+    results: '[5] Results',
+    explorer: '[6] Explorer',
+    methodology: '[7] Methodology',
+    math: '[8] Math',
+    algorithms: '[9] Algorithms',
+    comparative: '[10] Comparison',
+    conclusion: '[11] Conclusion',
+    about: '[12] Citation',
+  };
+
+  function updateNavLabel() {
+    const idx = currentSectionIndex();
+    const id = SECTION_IDS[idx];
+    if (navWordmark && SECTION_LABELS[id]) {
+      navWordmark.textContent = SECTION_LABELS[id];
+    }
+  }
+  window.addEventListener('scroll', updateNavLabel, { passive: true });
+
+  /* ================================================================
+     INTERACTIVE EXPLORER
+  ================================================================ */
   const EXPLORER_DATA = {
     lr: {
       roc:   { k: '0.838', n: '0.713', delta: '-14.9%', body: 'Logistic Regression achieved ROC-AUC of 0.838 in-domain (Kaggle). Under domain shift, this dropped to 0.713 on NHANES, a 14.9% reduction. The non-overlapping 95% bootstrap confidence intervals (0.788-0.878 vs 0.680-0.753) confirm this degradation is statistically significant.' },
