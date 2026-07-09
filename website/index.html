@@ -1,26 +1,2408 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cross-Dataset Generalisation & Calibration Analysis of Stroke Risk Prediction Models</title>
-    <meta name="description" content="Research showcase: investigating whether stroke prediction ML models trained on one dataset generalise to a different population without retraining. By Swayam Patnaik, NIST University." />
-    <meta name="author" content="Swayam Patnaik" />
-    <meta name="keywords" content="stroke prediction, machine learning, cross-dataset generalisation, calibration, PR-AUC, ROC-AUC, domain shift, clinical AI" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cross-Dataset Generalisation and Calibration Analysis of Stroke Risk Prediction Models</title>
+  <meta name="description" content="Research publication by Swayam Patnaik investigating cross-domain generalisation failure of stroke risk prediction models. ROC-AUC masked a 51-63% PR-AUC collapse under dataset shift from Kaggle to NHANES 2021-2023." />
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="Cross-Dataset Generalisation & Calibration Analysis of Stroke Risk Prediction Models" />
-    <meta property="og:description" content="What happens when clinical AI meets a population it has never seen? PR-AUC collapsed 51–63% under domain shift." />
-    <meta property="og:type" content="website" />
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
 
-    <!-- Google Fonts: Inter, DM Sans, JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  <!-- JetBrains Mono (Berkeley Mono substitute) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ================================================================
+       DESIGN TOKENS -- OpenCode Terminal Design System
+    ================================================================ */
+    :root {
+      --font: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'SFMono-Regular',
+              Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+      /* Color tokens */
+      --ink:          #201d1d;
+      --ink-deep:     #0f0000;
+      --charcoal:     #302c2c;
+      --body:         #424245;
+      --mute:         #646262;
+      --stone:        #6e6e73;
+      --ash:          #9a9898;
+      --canvas:       #fdfcfc;
+      --surface-soft: #f8f7f7;
+      --surface-card: #f1eeee;
+      --surface-dark: #201d1d;
+      --surface-dark-elevated: #302c2c;
+      --hairline:     rgba(15,0,0,0.12);
+      --hairline-strong: #646262;
+      --on-dark:      #fdfcfc;
+      --on-dark-mute: #9a9898;
+      --accent:       #007aff;
+      --danger:       #ff3b30;
+      --warning:      #ff9f0a;
+      --success:      #30d158;
+
+      /* Spacing */
+      --s-xxs: 1px;
+      --s-xs:  4px;
+      --s-sm:  8px;
+      --s-md:  12px;
+      --s-lg:  16px;
+      --s-xl:  24px;
+      --s-xxl: 32px;
+      --s-section: 96px;
+
+      /* Radius */
+      --r-sm: 4px;
+    }
+
+    /* ================================================================
+       RESET & BASE
+    ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--body);
+      background: var(--canvas);
+    }
+
+    /* ================================================================
+       TYPOGRAPHY SCALE
+    ================================================================ */
+    .display-xl { font-size: 38px; font-weight: 700; line-height: 1.5; color: var(--on-dark); }
+    .heading-md  { font-size: 16px; font-weight: 700; line-height: 1.5; color: var(--ink); }
+    .body-md     { font-size: 16px; font-weight: 400; line-height: 1.5; }
+    .body-strong { font-size: 16px; font-weight: 500; line-height: 1.5; }
+    .caption-md  { font-size: 14px; font-weight: 400; line-height: 2; }
+    .button-md   { font-size: 16px; font-weight: 500; line-height: 2; }
+
+    @media (max-width: 640px) {
+      .display-xl { font-size: 26px; }
+    }
+
+    /* ================================================================
+       LAYOUT
+    ================================================================ */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 var(--s-xl); }
+    .container-wide { max-width: 1100px; margin: 0 auto; padding: 0 var(--s-xl); }
+
+    section { padding: var(--s-section) 0; border-top: 1px solid var(--hairline); }
+    section:first-of-type { border-top: none; }
+
+    @media (max-width: 768px) {
+      section { padding: 64px 0; }
+    }
+    @media (max-width: 640px) {
+      section { padding: 48px 0; }
+      .container, .container-wide { padding: 0 var(--s-lg); }
+    }
+
+    /* ================================================================
+       PRIMARY NAV
+    ================================================================ */
+    #primary-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 56px;
+      background: var(--canvas);
+      border-bottom: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+    }
+
+    #primary-nav .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 var(--s-xl);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-xl);
+    }
+
+    .nav-wordmark {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      flex: 1;
+      justify-content: center;
+      scrollbar-width: none;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--mute);
+      text-decoration: none;
+      padding: 4px 10px;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--on-dark);
+      background: var(--ink);
+      border: none;
+      border-radius: var(--r-sm);
+      padding: 4px 16px;
+      height: 32px;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .nav-cta:hover { background: var(--ink-deep); }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+    }
+
+    /* ================================================================
+       BUTTONS
+    ================================================================ */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 2;
+      color: var(--on-dark);
+      background: var(--ink);
+      border: none;
+      border-radius: var(--r-sm);
+      padding: 4px 20px;
+      height: 36px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--ink-deep); }
+    .btn-primary[disabled], .btn-primary.disabled {
+      background: var(--surface-card);
+      color: var(--ash);
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 2;
+      color: var(--ink);
+      background: var(--canvas);
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--r-sm);
+      padding: 4px 20px;
+      height: 36px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+    /* ================================================================
+       SECTION LABELS & HEADINGS
+    ================================================================ */
+    .section-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: var(--s-sm);
+    }
+    .section-label::before { content: '[+] '; }
+
+    .section-heading {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: var(--s-lg);
+    }
+
+    .section-sub {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--body);
+      line-height: 1.6;
+      max-width: 680px;
+      margin-bottom: var(--s-xxl);
+    }
+
+    /* ================================================================
+       HERO -- DARK TUI MOCKUP
+    ================================================================ */
+    #hero { border-top: none; padding: 0; }
+
+    .hero-tui {
+      background: var(--surface-dark);
+      padding: 64px 32px;
+      width: 100%;
+    }
+
+    .hero-tui-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ASCII block-pixel wordmark */
+    .ascii-wordmark {
+      font-family: var(--font);
+      font-size: 11px;
+      line-height: 1.2;
+      color: var(--on-dark);
+      white-space: pre;
+      margin-bottom: var(--s-xl);
+      opacity: 0.85;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--on-dark-mute);
+      background: var(--surface-dark-elevated);
+      border-radius: var(--r-sm);
+      padding: 2px 10px;
+      margin-bottom: var(--s-xl);
+    }
+
+    .hero-headline {
+      font-size: 38px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--on-dark);
+      margin-bottom: var(--s-lg);
+      max-width: 760px;
+    }
+
+    @media (max-width: 640px) {
+      .hero-headline { font-size: 26px; }
+      .hero-tui { padding: 48px 20px; }
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--on-dark-mute);
+      line-height: 1.6;
+      max-width: 640px;
+      margin-bottom: var(--s-xxl);
+    }
+
+    .tui-prompt-row {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s-sm);
+      background: var(--surface-dark-elevated);
+      border-radius: var(--r-sm);
+      padding: 8px 14px;
+      font-size: 14px;
+      color: var(--on-dark);
+      margin-bottom: var(--s-xl);
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .tui-prompt-row .pipe { color: var(--on-dark-mute); }
+    .tui-prompt-row .cmd { color: var(--on-dark); font-weight: 500; }
+    .tui-prompt-row .token {
+      background: rgba(255,255,255,0.08);
+      border-radius: var(--r-sm);
+      padding: 1px 6px;
+      color: var(--ash);
+    }
+
+    .hero-stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-lg);
+      margin-bottom: var(--s-xxl);
+    }
+
+    .hero-stat-pill {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--on-dark-mute);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--r-sm);
+      padding: 4px 12px;
+    }
+    .hero-stat-pill.danger { border-color: rgba(255,59,48,0.4); color: #ff6b62; }
+    .hero-stat-pill.primary { border-color: rgba(0,122,255,0.4); color: #4da3ff; }
+
+    .hero-cta-row {
+      display: flex;
+      align-items: center;
+      gap: var(--s-lg);
+      flex-wrap: wrap;
+    }
+
+    .hero-keybindings {
+      margin-top: var(--s-xxl);
+      padding-top: var(--s-lg);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      font-size: 14px;
+      color: var(--ash);
+    }
+    .hero-keybindings kbd {
+      font-family: var(--font);
+      background: rgba(255,255,255,0.06);
+      border-radius: var(--r-sm);
+      padding: 2px 6px;
+      font-size: 13px;
+      color: var(--ash);
+    }
+
+    /* Hero stats below dark section */
+    .hero-stats-strip {
+      background: var(--surface-card);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .hero-stats-strip .stats-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--s-xl);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--s-lg);
+    }
+    .stat-box { text-align: left; }
+    .stat-box .stat-val {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .stat-box .stat-lbl {
+      display: block;
+      font-size: 14px;
+      color: var(--mute);
+      margin-top: 4px;
+    }
+
+    /* ================================================================
+       LIST ROWS (ASCII bracket bullets)
+    ================================================================ */
+    .list-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--s-md);
+      padding: 8px 0;
+      color: var(--body);
+      border-bottom: 1px solid var(--hairline);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .list-row:last-child { border-bottom: none; }
+    .list-row .marker {
+      flex-shrink: 0;
+      font-weight: 700;
+      color: var(--ink);
+      width: 28px;
+    }
+    .list-row .label { font-weight: 500; color: var(--ink); }
+    .list-row .desc  { color: var(--body); }
+
+    /* ================================================================
+       TABLES
+    ================================================================ */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .data-table th {
+      text-align: left;
+      font-weight: 700;
+      color: var(--ink);
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--ink);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--hairline);
+      color: var(--body);
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .center { text-align: center; }
+    .data-table .degrade { background: rgba(255,59,48,0.06); }
+    .data-table .highlight-row { background: var(--surface-soft); }
+    .data-table .mono { font-family: var(--font); font-size: 13px; }
+    .data-table .severe { color: var(--danger); font-weight: 500; }
+    .data-table .moderate { color: var(--warning); font-weight: 500; }
+    .data-table .stable { color: var(--success); font-weight: 500; }
+    .data-table .this-study { color: var(--ink); font-weight: 500; }
+
+    .table-scroll { overflow-x: auto; }
+    .table-scroll { -webkit-overflow-scrolling: touch; }
+
+    /* ================================================================
+       CALLOUT BOX
+    ================================================================ */
+    .callout {
+      border-left: 2px solid var(--ink);
+      padding: var(--s-md) var(--s-lg);
+      background: var(--surface-soft);
+      margin: var(--s-xl) 0;
+      font-size: 15px;
+      color: var(--body);
+      line-height: 1.6;
+    }
+    .callout.danger { border-color: var(--danger); }
+    .callout.warning { border-color: var(--warning); }
+    .callout.success { border-color: var(--success); }
+    .callout.primary { border-color: var(--accent); }
+
+    /* ================================================================
+       INSTALL SNIPPET
+    ================================================================ */
+    .snippet {
+      background: var(--surface-card);
+      border-radius: var(--r-sm);
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-md);
+      margin: var(--s-lg) 0;
+    }
+    .snippet code { font-family: var(--font); }
+    .snippet button {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mute);
+      background: none;
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--r-sm);
+      padding: 2px 10px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .snippet button:hover { color: var(--ink); border-color: var(--ink); }
+
+    /* ================================================================
+       CODE / PSEUDOCODE BLOCK
+    ================================================================ */
+    .code-block {
+      background: var(--ink);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      margin: var(--s-xl) 0;
+    }
+    .code-block-header {
+      background: var(--charcoal);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .code-block-header .title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--on-dark);
+    }
+    .code-block-header .subtitle {
+      font-size: 13px;
+      color: var(--ash);
+    }
+    .code-block-header .copy-btn {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ash);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--r-sm);
+      padding: 2px 10px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .code-block-header .copy-btn:hover { color: var(--on-dark); }
+    .code-block pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--on-dark-mute);
+    }
+
+    /* ================================================================
+       TABS
+    ================================================================ */
+    .tab-strip {
+      display: flex;
+      border-bottom: 1px solid var(--hairline-strong);
+      margin-bottom: var(--s-xxl);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-strip::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 2;
+      color: var(--mute);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      padding: 8px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active {
+      color: var(--ink);
+      border-bottom-color: var(--ash);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ================================================================
+       FAQ / ACCORDION
+    ================================================================ */
+    .faq-item {
+      border-bottom: 1px solid var(--hairline);
+    }
+    .faq-toggle {
+      display: flex;
+      align-items: baseline;
+      gap: var(--s-md);
+      width: 100%;
+      padding: 12px 0;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--ink);
+      transition: color 0.15s;
+    }
+    .faq-toggle:hover { color: var(--charcoal); }
+    .faq-toggle .marker {
+      font-weight: 700;
+      color: var(--ink);
+      min-width: 16px;
+      flex-shrink: 0;
+    }
+    .faq-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .faq-body.open { max-height: 400px; }
+    .faq-body-inner {
+      padding: 0 0 16px 28px;
+      font-size: 16px;
+      color: var(--body);
+      line-height: 1.6;
+    }
+
+    /* ================================================================
+       DATASET CARDS
+    ================================================================ */
+    .dataset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--hairline);
+    }
+    .dataset-card {
+      padding: var(--s-xl);
+      background: var(--canvas);
+      border-right: 1px solid var(--hairline);
+    }
+    .dataset-card:last-child { border-right: none; }
+    @media (max-width: 768px) {
+      .dataset-grid { grid-template-columns: 1fr; }
+      .dataset-card { border-right: none; border-bottom: 1px solid var(--hairline); }
+      .dataset-card:last-child { border-bottom: none; }
+    }
+    .dataset-card .ds-tag {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--on-dark);
+      background: var(--ink);
+      border-radius: var(--r-sm);
+      padding: 2px 8px;
+      margin-bottom: var(--s-sm);
+    }
+    .dataset-card .ds-tag.warn {
+      background: var(--surface-card);
+      color: var(--ink);
+      border: 1px solid var(--hairline-strong);
+    }
+    .dataset-card h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: var(--s-sm); }
+    .dataset-card p  { font-size: 15px; color: var(--body); line-height: 1.6; }
+    .ds-stat-row { display: flex; gap: var(--s-xl); margin: var(--s-md) 0; flex-wrap: wrap; }
+    .ds-stat { font-size: 14px; color: var(--mute); }
+    .ds-stat strong { color: var(--ink); display: block; font-size: 16px; font-weight: 700; }
+
+    /* ================================================================
+       MAPPING TABLE (harmonisation)
+    ================================================================ */
+    .mapping-row {
+      display: flex;
+      align-items: center;
+      gap: var(--s-lg);
+      padding: 6px 0;
+      border-bottom: 1px solid var(--hairline);
+      font-size: 14px;
+    }
+    .mapping-row:last-child { border-bottom: none; }
+    .mapping-row .from, .mapping-row .to { font-family: var(--font); color: var(--ink); font-weight: 500; min-width: 120px; }
+    .mapping-row .arrow { color: var(--ash); }
+
+    /* ================================================================
+       BAR CHART (CSS-only SVG bars)
+    ================================================================ */
+    .bar-chart-wrap { overflow-x: auto; }
+    .bar-chart { min-width: 320px; }
+    .bar-group { display: flex; align-items: center; gap: var(--s-md); margin-bottom: var(--s-sm); font-size: 14px; }
+    .bar-label { width: 140px; flex-shrink: 0; color: var(--body); text-align: right; }
+    .bar-track { flex: 1; height: 20px; background: var(--surface-card); border-radius: var(--r-sm); position: relative; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--ink); border-radius: var(--r-sm); transition: width 0.6s ease; }
+    .bar-fill.kaggle { background: var(--ink); }
+    .bar-fill.nhanes { background: var(--ash); }
+    .bar-fill.danger-fill { background: var(--danger); opacity: 0.8; }
+    .bar-fill.warn-fill { background: var(--warning); opacity: 0.8; }
+    .bar-val { width: 48px; flex-shrink: 0; color: var(--mute); font-size: 13px; }
+    .bar-legend { display: flex; gap: var(--s-xl); margin-bottom: var(--s-lg); font-size: 14px; }
+    .bar-legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+    .legend-dot.kaggle { background: var(--ink); }
+    .legend-dot.nhanes { background: var(--ash); }
+
+    /* ================================================================
+       MATH EQUATIONS
+    ================================================================ */
+    .eq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: var(--s-xl); }
+    @media (max-width: 640px) { .eq-grid { grid-template-columns: 1fr; } }
+
+    .eq-card {
+      border: 1px solid var(--hairline);
+      padding: var(--s-xl);
+      background: var(--canvas);
+    }
+    .eq-number {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      background: var(--surface-card);
+      border-radius: var(--r-sm);
+      padding: 1px 8px;
+      margin-bottom: var(--s-sm);
+    }
+    .eq-label { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: var(--s-sm); }
+    .eq-desc { font-size: 15px; color: var(--body); margin-bottom: var(--s-md); line-height: 1.5; }
+    .eq-formula {
+      background: var(--surface-card);
+      border-radius: var(--r-sm);
+      padding: 14px 16px;
+      margin-bottom: var(--s-sm);
+      overflow-x: auto;
+      text-align: center;
+      font-size: 14px;
+    }
+    .eq-note { font-size: 13px; color: var(--mute); }
+
+    /* ================================================================
+       NOTATION TABLE
+    ================================================================ */
+    .notation-table {
+      border: 1px solid var(--hairline);
+      width: 100%;
+      margin-bottom: var(--s-xxl);
+    }
+    .notation-table .nt-header {
+      background: var(--surface-card);
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .nt-row {
+      display: flex;
+      align-items: baseline;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--hairline);
+      font-size: 14px;
+    }
+    .nt-row:last-child { border-bottom: none; }
+    .nt-sym { min-width: 80px; font-weight: 700; color: var(--ink); }
+    .nt-desc { color: var(--body); }
+
+    /* ================================================================
+       GAP CARDS
+    ================================================================ */
+    .gap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; border: 1px solid var(--hairline); margin-bottom: var(--s-xxl); }
+    .gap-card { padding: var(--s-xl); background: var(--canvas); border-right: 1px solid var(--hairline); }
+    .gap-card:last-child { border-right: none; }
+    @media (max-width: 768px) {
+      .gap-grid { grid-template-columns: 1fr; }
+      .gap-card { border-right: none; border-bottom: 1px solid var(--hairline); }
+      .gap-card:last-child { border-bottom: none; }
+    }
+    .gap-num {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--on-dark);
+      background: var(--ink);
+      border-radius: var(--r-sm);
+      padding: 2px 8px;
+      margin-bottom: var(--s-sm);
+    }
+    .gap-card h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: var(--s-sm); }
+    .gap-card p  { font-size: 15px; color: var(--body); line-height: 1.6; margin-bottom: var(--s-md); }
+    .gap-highlight {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--surface-card);
+      border-radius: var(--r-sm);
+      padding: 6px 10px;
+    }
+    .gap-highlight::before { content: '-> '; }
+
+    /* ================================================================
+       CONCLUSION CARDS
+    ================================================================ */
+    .conclusion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; border: 1px solid var(--hairline); margin-bottom: var(--s-xxl); }
+    .conclusion-card { padding: var(--s-xl); background: var(--canvas); border-right: 1px solid var(--hairline); }
+    .conclusion-card:last-child { border-right: none; }
+    @media (max-width: 768px) {
+      .conclusion-grid { grid-template-columns: 1fr; }
+      .conclusion-card { border-right: none; border-bottom: 1px solid var(--hairline); }
+      .conclusion-card:last-child { border-bottom: none; }
+    }
+    .conclusion-card .c-num { font-size: 38px; font-weight: 700; color: var(--surface-card); }
+    .conclusion-card .c-stat { font-size: 20px; font-weight: 700; color: var(--ink); }
+    .conclusion-card .c-stat-lbl { font-size: 13px; color: var(--mute); margin-bottom: var(--s-sm); }
+    .conclusion-card h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: var(--s-sm); }
+    .conclusion-card p  { font-size: 15px; color: var(--body); line-height: 1.6; }
+
+    /* Future directions */
+    .future-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s-xl); }
+    .future-card {
+      display: flex;
+      gap: var(--s-lg);
+      padding: var(--s-xl);
+      border: 1px solid var(--hairline);
+      background: var(--canvas);
+    }
+    .future-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+    .future-card h4 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: var(--s-xs); }
+    .future-card p  { font-size: 15px; color: var(--body); line-height: 1.6; }
+
+    /* ================================================================
+       COMPARATIVE ANALYSIS TABLE
+    ================================================================ */
+    .comp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .comp-table th {
+      font-weight: 700;
+      color: var(--ink);
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--ink);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .comp-table th.this { background: var(--surface-soft); }
+    .comp-table td { padding: 9px 14px; border-bottom: 1px solid var(--hairline); color: var(--body); vertical-align: top; }
+    .comp-table td.this { background: var(--surface-soft); color: var(--ink); font-weight: 500; }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .comp-table .dim-col { font-weight: 500; color: var(--mute); white-space: nowrap; }
+
+    /* ================================================================
+       LITERATURE REVIEW
+    ================================================================ */
+    .lit-area { margin-bottom: var(--s-xxl); }
+    .lit-area-header {
+      display: flex;
+      align-items: baseline;
+      gap: var(--s-md);
+      margin-bottom: var(--s-md);
+      padding-bottom: var(--s-sm);
+      border-bottom: 1px solid var(--hairline);
+    }
+    .lit-area-num { font-size: 14px; font-weight: 700; color: var(--mute); }
+    .lit-area-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .lit-summary { font-size: 15px; color: var(--body); line-height: 1.6; margin-bottom: var(--s-lg); }
+    .paper-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--s-md); }
+    .paper-card { padding: var(--s-md) var(--s-lg); border: 1px solid var(--hairline); background: var(--surface-soft); }
+    .paper-ref { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .paper-finding { font-size: 14px; color: var(--body); line-height: 1.5; }
+
+    /* ================================================================
+       WORKFLOW DIAGRAM (ASCII-style text pipeline)
+    ================================================================ */
+    .workflow-pipeline {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: var(--s-md);
+      margin: var(--s-xxl) 0;
+    }
+    .wf-step {
+      flex: 1;
+      min-width: 160px;
+      padding: var(--s-lg);
+      border: 1px solid var(--hairline);
+      background: var(--surface-soft);
+      position: relative;
+    }
+    .wf-step + .wf-step { border-left: none; }
+    .wf-step h4 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .wf-step p  { font-size: 13px; color: var(--mute); }
+    .wf-step .wf-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ash);
+      margin-bottom: var(--s-xs);
+    }
+    .wf-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      color: var(--ash);
+      font-size: 18px;
+      flex-shrink: 0;
+      padding-top: 42px;
+    }
+
+    /* ================================================================
+       ABOUT / CITATION
+    ================================================================ */
+    .bibtex-block {
+      background: var(--surface-card);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-sm);
+      padding: var(--s-xl);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--body);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .author-row {
+      display: flex;
+      align-items: center;
+      gap: var(--s-lg);
+      padding: var(--s-lg) 0;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: var(--s-xxl);
+    }
+    .author-initials {
+      width: 48px;
+      height: 48px;
+      background: var(--ink);
+      color: var(--on-dark);
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .author-name { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .author-role { font-size: 14px; color: var(--mute); }
+
+    /* ================================================================
+       FOOTER
+    ================================================================ */
+    #site-footer {
+      background: var(--canvas);
+      border-top: 1px solid var(--hairline);
+      padding: var(--s-xxl) 0;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: var(--s-lg);
+    }
+    .footer-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--s-sm) var(--s-xl);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--mute);
+      text-decoration: none;
+      border-right: 1px solid var(--hairline);
+      transition: color 0.15s;
+    }
+    .footer-links a:last-child { border-right: none; }
+    .footer-links a:hover { color: var(--ink); }
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--s-md);
+      font-size: 14px;
+      color: var(--mute);
+    }
+
+    /* ================================================================
+       INTERACTIVE EXPLORER
+    ================================================================ */
+    .explorer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-md);
+      margin-bottom: var(--s-xl);
+    }
+    .explorer-select {
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--surface-soft);
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--r-sm);
+      padding: 6px 12px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      min-width: 180px;
+    }
+    .explorer-select:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    .explorer-result {
+      border: 1px solid var(--hairline);
+      padding: var(--s-xl);
+      background: var(--surface-soft);
+    }
+    .explorer-result .er-numbers {
+      display: flex;
+      gap: var(--s-xxl);
+      margin-bottom: var(--s-lg);
+      flex-wrap: wrap;
+    }
+    .explorer-result .er-num { font-size: 28px; font-weight: 700; color: var(--ink); }
+    .explorer-result .er-lbl { font-size: 13px; color: var(--mute); }
+    .explorer-result .er-gap { color: var(--danger); }
+    .explorer-result .er-body { font-size: 16px; color: var(--body); line-height: 1.6; }
+
+    /* ================================================================
+       UTILITY
+    ================================================================ */
+    .mt-sm  { margin-top: var(--s-sm); }
+    .mt-md  { margin-top: var(--s-md); }
+    .mt-lg  { margin-top: var(--s-lg); }
+    .mt-xl  { margin-top: var(--s-xl); }
+    .mt-xxl { margin-top: var(--s-xxl); }
+    .mb-sm  { margin-bottom: var(--s-sm); }
+    .mb-md  { margin-bottom: var(--s-md); }
+    .mb-lg  { margin-bottom: var(--s-lg); }
+    .mb-xl  { margin-bottom: var(--s-xl); }
+    .mb-xxl { margin-bottom: var(--s-xxl); }
+
+    .ink     { color: var(--ink); }
+    .muted   { color: var(--mute); }
+    .strong  { font-weight: 700; }
+    .mono    { font-family: var(--font); }
+    .hidden  { display: none !important; }
+
+    a { color: var(--ink); text-decoration: underline; }
+    a:hover { color: var(--charcoal); }
+
+    /* ================================================================
+       RESPONSIVE HELPERS
+    ================================================================ */
+    @media (max-width: 640px) {
+      .eq-grid { grid-template-columns: 1fr; }
+      .gap-grid { grid-template-columns: 1fr; }
+      .conclusion-grid { grid-template-columns: 1fr; }
+      .paper-grid { grid-template-columns: 1fr; }
+      .future-grid { grid-template-columns: 1fr; }
+      .workflow-pipeline { flex-direction: column; }
+      .wf-step { min-width: unset; }
+      .wf-arrow { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ================================================================
+     PRIMARY NAV
+================================================================ -->
+<nav id="primary-nav" role="navigation" aria-label="Primary navigation">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-wordmark">[SP] Stroke Generalisation</a>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#literature">Literature</a>
+      <a href="#gaps">Gaps</a>
+      <a href="#datasets">Data</a>
+      <a href="#results">Results</a>
+      <a href="#explorer">Explorer</a>
+      <a href="#math">Math</a>
+      <a href="#algorithms">Algorithms</a>
+      <a href="#comparative">Comparison</a>
+      <a href="#conclusion">Conclusion</a>
+      <a href="#about">Cite</a>
+    </div>
+    <a href="https://github.com/patnaikswayam131/CROSS-DATASET-GENERALISATION-AND-CALIBRATION-ANALYSIS-OF-STROKE-RISK-PREDICTION-MODELS" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a>
+  </div>
+</nav>
+
+<!-- ================================================================
+     HERO -- DARK TUI MOCKUP
+================================================================ -->
+<section id="hero">
+  <div class="hero-tui">
+    <div class="hero-tui-inner">
+
+      <!-- ASCII wordmark -->
+      <div class="ascii-wordmark" aria-label="Stroke Risk Research">
+  ____  _            _        ____  _     _
+ / ___|| |_ _ __ ___| | _____|  _ \(_)___| | __
+ \___ \| __| '__/ _ \ |/ / _ \ |_) | / __| |/ /
+  ___) | |_| | |  __/   &lt;  __/  _ &lt;| \__ \   &lt;
+ |____/ \__|_|  \___|_|\_\___|_| \_\_|___/_|\_\</div>
+
+      <!-- Badge -->
+      <div class="hero-badge">[preprint] Research Publication -- Machine Learning -- Clinical AI</div>
+
+      <!-- Headline -->
+      <h1 class="hero-headline">Cross-Dataset Generalisation and Calibration Analysis of Stroke Risk Prediction Models</h1>
+
+      <!-- Subheadline -->
+      <p class="hero-sub">What happens when clinical AI meets a population it has never seen? Three classifiers trained on Kaggle, evaluated zero-shot on NHANES 2021-2023.</p>
+
+      <!-- Prompt row -->
+      <div class="tui-prompt-row">
+        <span class="pipe">|</span>
+        <span class="cmd">evaluate</span>
+        <span class="token">kaggle -> nhanes</span>
+        <span class="token">no-retraining</span>
+        <span class="token">N=8,276</span>
+      </div>
+
+      <!-- Stat pills -->
+      <div class="hero-stat-row">
+        <span class="hero-stat-pill danger">[!] 51-63% PR-AUC Collapse</span>
+        <span class="hero-stat-pill primary">[+] 3 Classifiers Evaluated</span>
+        <span class="hero-stat-pill">[+] 2 Independent Datasets</span>
+      </div>
+
+      <!-- CTAs -->
+      <div class="hero-cta-row">
+        <a href="https://github.com/patnaikswayam131/CROSS-DATASET-GENERALISATION-AND-CALIBRATION-ANALYSIS-OF-STROKE-RISK-PREDICTION-MODELS" target="_blank" rel="noopener noreferrer" class="btn-primary">View on GitHub</a>
+        <span class="btn-primary disabled" aria-disabled="true" title="Paper not yet published">Paper -- Coming Soon</span>
+      </div>
+
+      <!-- Keybindings hint -->
+      <div class="hero-keybindings">
+        <kbd>tab</kbd> navigate sections &nbsp;&nbsp;
+        <kbd>ctrl+f</kbd> search &nbsp;&nbsp;
+        <kbd>esc</kbd> collapse
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="hero-stats-strip">
+    <div class="stats-inner">
+      <div class="stat-box">
+        <span class="stat-val">63%</span>
+        <span class="stat-lbl">Maximum PR-AUC Collapse (LR)</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val">0.709</span>
+        <span class="stat-lbl">Best Cross-Domain ROC-AUC (RF 0.725)</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val">PSI 1.495</span>
+        <span class="stat-lbl">Glucose Distribution Shift (Severe)</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val">-0.130</span>
+        <span class="stat-lbl">XGBoost Isotonic Regression Collapse</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PROBLEM STATEMENT
+================================================================ -->
+<section id="problem">
+  <div class="container">
+    <p class="section-label">Problem Statement</p>
+    <h2 class="section-heading">The Benchmark Illusion</h2>
+
+    <p class="body-md mb-xxl" style="max-width:680px; color:var(--body); line-height:1.6;">
+      Machine learning models for stroke prediction are typically evaluated on held-out splits of the same dataset they were trained on. This creates an illusion of performance: the model never encounters a distribution it has not already learned. In clinical deployment, however, the target population is almost never the same as the training population. Age distributions differ, measurement protocols vary, and disease definitions change between institutions.
+    </p>
+
+    <p class="body-md mb-xxl" style="max-width:680px; color:var(--body); line-height:1.6;">
+      Dataset shift occurs when the joint distribution P(X,Y) differs between training and deployment. This encompasses covariate shift (different feature distributions), prior probability shift (different class prevalence), and concept shift (different relationships between features and outcomes). Standard held-out evaluation, no matter how rigorous the train-test split, cannot detect any of these failure modes because both sets are drawn from the same source.
+    </p>
+
+    <p class="body-md mb-xxl" style="max-width:680px; color:var(--body); line-height:1.6;">
+      For rare events like stroke (4-5% prevalence), ROC-AUC is misleadingly optimistic. It credits the model for correctly identifying the overwhelming majority of non-stroke cases, which any trivial classifier can achieve. PR-AUC, by contrast, evaluates only the precision-recall trade-off for the minority class. When a model achieves PR-AUC of 0.077 on the target population, it offers only 1.9x the performance of a random classifier -- a finding that ROC-AUC of 0.709 completely conceals.
+    </p>
+
+    <!-- Pipeline -->
+    <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Experimental Pipeline</p>
+    <div class="workflow-pipeline">
+      <div class="wf-step">
+        <div class="wf-num">[1]</div>
+        <h4>Kaggle Dataset</h4>
+        <p>N=5,109 -- 4.87% stroke</p>
+      </div>
+      <div class="wf-arrow">--&gt;</div>
+      <div class="wf-step">
+        <div class="wf-num">[2]</div>
+        <h4>Train Models</h4>
+        <p>LR, RF, XGBoost (SMOTE)</p>
+      </div>
+      <div class="wf-arrow">- -&gt;</div>
+      <div class="wf-step">
+        <div class="wf-num">[3]</div>
+        <h4>Apply to NHANES</h4>
+        <p>No retraining -- zero-shot</p>
+      </div>
+      <div class="wf-arrow">--&gt;</div>
+      <div class="wf-step">
+        <div class="wf-num">[4]</div>
+        <h4>Measure Degradation</h4>
+        <p>ROC, PR-AUC, Brier, ECE</p>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <strong>[!]</strong> PR-AUC collapsed 51-63% under domain shift. At NHANES prevalence of 4.1%, the cross-domain models achieved only 1.9x the random classifier baseline -- a failure mode entirely invisible to ROC-AUC.
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     LITERATURE REVIEW
+================================================================ -->
+<section id="literature">
+  <div class="container">
+    <p class="section-label">Prior Studies</p>
+    <h2 class="section-heading">Literature Review</h2>
+    <p class="section-sub">The existing work on machine learning for stroke prediction spans three thematic areas: benchmark model development, class imbalance management, and cross-dataset generalisation.</p>
+
+    <!-- Area 2.1 -->
+    <div class="lit-area">
+      <div class="lit-area-header">
+        <span class="lit-area-num">2.1</span>
+        <span class="lit-area-title">Stroke Prediction and In-Domain Evaluation</span>
+      </div>
+      <p class="lit-summary">Multiple studies achieve high in-domain ROC-AUC (0.80-0.98) on the Kaggle Stroke Prediction Dataset but share a critical limitation: evaluation is restricted to held-out splits of the same source population.</p>
+      <div class="paper-grid">
+        <div class="paper-card">
+          <p class="paper-ref">Sutcu et al. (2025)</p>
+          <p class="paper-finding">Multi-method Kaggle analysis; XGBoost is best-performing classifier on in-domain metrics.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Chakraborty et al. (2024)</p>
+          <p class="paper-finding">98.6% accuracy via stacked ensemble + PCA dimensionality reduction.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Hassan et al. (2024)</p>
+          <p class="paper-finding">Identifies age, glucose, and cardiovascular history as dominant predictors.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Chun et al. (2021)</p>
+          <p class="paper-finding">Stroke risk models from 0.5 million Chinese adults; evaluation restricted to development population.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Huang and Liu (2025)</p>
+          <p class="paper-finding">NHANES-based workflow -- trains and validates within the same survey cycle without external testing.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Saleem et al. (2025)</p>
+          <p class="paper-finding">CBDA-ResNet50 with augmentation improves minority-class recall, same in-domain evaluation constraint.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Area 2.2 -->
+    <div class="lit-area">
+      <div class="lit-area-header">
+        <span class="lit-area-num">2.2</span>
+        <span class="lit-area-title">Class Imbalance in Clinical Prediction</span>
+      </div>
+      <p class="lit-summary">Stroke datasets present fewer than 5% positive cases. Balancing methods improve recall but can distort calibration -- a confound present before any domain shift occurs.</p>
+      <div class="paper-grid">
+        <div class="paper-card">
+          <p class="paper-ref">Melnykova et al. (2025)</p>
+          <p class="paper-finding">Standard classifiers fail stroke-case detection under imbalance; recommends cost-sensitive alternatives.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Araf et al. (2024)</p>
+          <p class="paper-finding">Cost-sensitive learning improves recall but may compromise calibration quality.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Salmi et al. (2024)</p>
+          <p class="paper-finding">10-year systematic review: ROC-AUC routinely masks minority-class detection failure.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Carriero et al. (2024)</p>
+          <p class="paper-finding">Simulation shows imbalance corrections can harm performance -- especially distorting predicted probabilities.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Sheetal et al. (2025)</p>
+          <p class="paper-finding">Cardiovascular prediction: high accuracy co-exists with clinically significant failure on positive cases.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Area 2.3 -->
+    <div class="lit-area" style="margin-bottom:0;">
+      <div class="lit-area-header">
+        <span class="lit-area-num">2.3</span>
+        <span class="lit-area-title">Cross-Dataset Generalisation and Domain Adaptation</span>
+      </div>
+      <p class="lit-summary">Domain adaptation methods achieve modest AUC recovery under moderate covariate shift, but assume covariate shift as the primary mechanism -- a premise this study directly challenges through concept shift analysis.</p>
+      <div class="paper-grid">
+        <div class="paper-card">
+          <p class="paper-ref">Silva et al. (2025)</p>
+          <p class="paper-finding">Systematic review of dataset shift detection; identifies PSI and KS tests as operationally useful diagnostics.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Lee et al. (2023)</p>
+          <p class="paper-finding">Standard ERM produces fragile EHR models; proposes stable prediction under distributional change.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Ryu et al. (2022)</p>
+          <p class="paper-finding">Same model across emergency departments shows site-to-site performance variation despite identical weights.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Guo et al. (2021)</p>
+          <p class="paper-finding">Temporal shift within a single institute degrades output beyond what label shift alone explains.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Lu et al. (2025)</p>
+          <p class="paper-finding">PSI values may be dominated by measurement protocol variation rather than demographic change.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Fan et al. (2025)</p>
+          <p class="paper-finding">Stroke survival models show substantial degradation outside the development site.</p>
+        </div>
+        <div class="paper-card">
+          <p class="paper-ref">Akinwumi et al. (2025)</p>
+          <p class="paper-finding">Metric selection substantially changes conclusions about relative model utility.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     RESEARCH GAPS
+================================================================ -->
+<section id="gaps">
+  <div class="container">
+    <p class="section-label">Motivation and Research Gaps</p>
+    <h2 class="section-heading">What Remains Unaddressed</h2>
+
+    <div class="callout primary mb-xxl">
+      <strong>[i] Motivation:</strong> Models trained on the Kaggle Stroke Prediction Dataset have shown ROC-AUC scores up to 0.98. These figures are cited as supporting evidence for clinical utility -- but such metrics cannot determine if learned decision boundaries are valid beyond the training distribution. Clinical decision support systems encounter patients with different demographic compositions, measurement instruments, and institutional practices. This gap between controlled benchmark evaluation and real-world deployment motivates a direct empirical test of generalisation on an independent, nationally representative cohort.
+    </div>
+
+    <div class="gap-grid">
+      <div class="gap-card">
+        <span class="gap-num">Gap 1</span>
+        <h3>No Cross-Population External Validation</h3>
+        <p>No prior study has evaluated Kaggle-trained stroke models against a nationally representative independent population survey. Even large-scale cohort studies evaluate only within the development population. Held-out in-distribution evaluation cannot determine whether learned patterns transfer to populations with different demographics, sampling methods, or clinical measurement protocols.</p>
+        <div class="gap-highlight">Held-out accuracy is not external validity</div>
+      </div>
+      <div class="gap-card">
+        <span class="gap-num">Gap 2</span>
+        <h3>ROC-AUC Dominates Despite Known Limitations</h3>
+        <p>ROC-AUC dominates evaluation in this field, yet under severe class imbalance it is well established that ROC-AUC masks substantial minority-class detection failure. For classifiers operating at 4-5% stroke prevalence, PR-AUC offers a more clinically meaningful criterion -- and studies reporting both metrics find that rankings and conclusions can differ markedly.</p>
+        <div class="gap-highlight">PR-AUC is the appropriate metric for rare-event tasks</div>
+      </div>
+      <div class="gap-card">
+        <span class="gap-num">Gap 3</span>
+        <h3>Measurement Protocol Mismatches Treated as Details</h3>
+        <p>Measurement protocol differences between datasets are routinely treated as administrative details rather than scientific confounds. The glucose variable demonstrates this risk: NHANES records fasting plasma glucose under standardised conditions, while Kaggle's average glucose level is of unspecified collection type. The resulting PSI of 1.495 cannot be remediated by any adaptation technique.</p>
+        <div class="gap-highlight">PSI = 1.495 for glucose -- not correctable, must be documented</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     DATASETS
+================================================================ -->
+<section id="datasets">
+  <div class="container">
+    <p class="section-label">Data</p>
+    <h2 class="section-heading">Source and Target Domains</h2>
+
+    <div class="dataset-grid mb-xxl">
+      <div class="dataset-card">
+        <span class="ds-tag">Training Data</span>
+        <h3>Source Domain -- Kaggle</h3>
+        <div class="ds-stat-row">
+          <div class="ds-stat"><strong>5,109</strong> Records</div>
+          <div class="ds-stat"><strong>4.87%</strong> Stroke Prevalence</div>
+          <div class="ds-stat"><strong>4</strong> Harmonised Features</div>
+        </div>
+        <p>The Kaggle Stroke Prediction Dataset is a widely-used benchmark containing demographic and clinical features. Models were trained on an 80/20 stratified split with SMOTE oversampling applied to the training fold only.</p>
+        <div class="list-row mt-md"><span class="marker">[+]</span><span>age</span></div>
+        <div class="list-row"><span class="marker">[+]</span><span>gender</span></div>
+        <div class="list-row"><span class="marker">[+]</span><span>bmi</span></div>
+        <div class="list-row"><span class="marker">[+]</span><span>avg_glucose_level</span></div>
+      </div>
+
+      <div class="dataset-card">
+        <span class="ds-tag warn">Evaluation Only -- Never Seen During Training</span>
+        <h3>Target Domain -- NHANES 2021-2023</h3>
+        <div class="ds-stat-row">
+          <div class="ds-stat"><strong>3,167</strong> Records</div>
+          <div class="ds-stat"><strong>4.10%</strong> Stroke Prevalence</div>
+          <div class="ds-stat"><strong>Nationally</strong> Representative</div>
+        </div>
+        <p>NHANES 2021-2023 is a nationally representative health survey conducted by the CDC. Data was extracted from four modules and harmonised to match the Kaggle feature schema.</p>
+        <div class="list-row mt-md"><span class="marker">[+]</span><span>DEMO_L -- Demographics</span></div>
+        <div class="list-row"><span class="marker">[+]</span><span>BMX_L -- Body Measurements</span></div>
+        <div class="list-row"><span class="marker">[+]</span><span>GLU_L -- Fasting Glucose</span></div>
+        <div class="list-row"><span class="marker">[+]</span><span>MCQ_L -- Medical Conditions</span></div>
+      </div>
+
+      <div class="dataset-card">
+        <h3>Feature Harmonisation</h3>
+        <p class="mb-lg">The primary confound is glucose measurement: Kaggle uses unspecified glucose readings while NHANES uses fasting plasma glucose. This definitional mismatch contributed to a PSI of 1.495, reflecting measurement protocol differences rather than a correctable population difference.</p>
+        <div class="mapping-row"><span class="from">age</span><span class="arrow">--&gt;</span><span class="to">RIDAGEYR</span></div>
+        <div class="mapping-row"><span class="from">gender</span><span class="arrow">--&gt;</span><span class="to">RIAGENDR</span></div>
+        <div class="mapping-row"><span class="from">bmi</span><span class="arrow">--&gt;</span><span class="to">BMXBMI</span></div>
+        <div class="mapping-row"><span class="from">avg_glucose_level</span><span class="arrow">--&gt;</span><span class="to">LBXGLU</span></div>
+        <div class="callout warning mt-md" style="font-size:14px;">
+          [!] Glucose PSI = 1.495 is not correctable -- it reflects a definitional mismatch between measurement protocols.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     RESULTS
+================================================================ -->
+<section id="results">
+  <div class="container">
+    <p class="section-label">Results</p>
+    <h2 class="section-heading">Performance Under Domain Shift</h2>
+
+    <!-- Tabs -->
+    <div class="tab-strip" role="tablist" aria-label="Results tabs">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-performance" id="btn-performance" onclick="switchTab('performance')">Performance</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-shift" id="btn-shift" onclick="switchTab('shift')">Shift Analysis</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ablation" id="btn-ablation" onclick="switchTab('ablation')">Ablation</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-concept" id="btn-concept" onclick="switchTab('concept')">Concept Shift and Calibration</button>
+    </div>
+
+    <!-- Tab: Performance -->
+    <div class="tab-panel active" id="tab-performance" role="tabpanel" aria-labelledby="btn-performance">
+      <div class="table-scroll mb-xl">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th class="center">ROC-AUC (K)</th>
+              <th class="center">ROC-AUC (N)</th>
+              <th class="center">PR-AUC (K)</th>
+              <th class="center">PR-AUC (N)</th>
+              <th class="center">Brier (K)</th>
+              <th class="center">Brier (N)</th>
+              <th class="center">ECE (K)</th>
+              <th class="center">ECE (N)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="strong">Logistic Regression</td>
+              <td class="center">0.838 [0.788-0.878]</td>
+              <td class="center degrade">0.713 [0.680-0.753]</td>
+              <td class="center">0.214 [0.153-0.308]</td>
+              <td class="center degrade">0.079 [0.064-0.107]</td>
+              <td class="center">0.175</td>
+              <td class="center degrade">0.269</td>
+              <td class="center">0.410</td>
+              <td class="center degrade">0.445</td>
+            </tr>
+            <tr>
+              <td class="strong">Random Forest</td>
+              <td class="center">0.824 [0.780-0.861]</td>
+              <td class="center degrade">0.725 [0.691-0.761]</td>
+              <td class="center">0.179 [0.129-0.251]</td>
+              <td class="center degrade">0.078 [0.063-0.101]</td>
+              <td class="center">0.132</td>
+              <td class="center degrade">0.185</td>
+              <td class="center">0.368</td>
+              <td class="center degrade">0.399</td>
+            </tr>
+            <tr>
+              <td class="strong">XGBoost</td>
+              <td class="center">0.808 [0.765-0.848]</td>
+              <td class="center degrade">0.709 [0.674-0.746]</td>
+              <td class="center">0.158 [0.115-0.224]</td>
+              <td class="center degrade">0.077 [0.061-0.107]</td>
+              <td class="center">0.098</td>
+              <td class="center degrade">0.123</td>
+              <td class="center">0.399</td>
+              <td class="center degrade">0.429</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:13px; color:var(--mute); margin-bottom:var(--s-xl);">K = Kaggle test set, N = NHANES cohort. Red-tinted cells indicate degraded performance. 95% bootstrap CI in brackets.</p>
+
+      <!-- ROC-AUC bar chart -->
+      <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">ROC-AUC Comparison (In-Domain vs Cross-Domain)</p>
+      <div class="bar-legend mb-md">
+        <div class="bar-legend-item"><div class="legend-dot kaggle"></div>Kaggle (in-domain)</div>
+        <div class="bar-legend-item"><div class="legend-dot nhanes"></div>NHANES (cross-domain)</div>
+      </div>
+      <div class="bar-chart mb-xl">
+        <div class="bar-group"><span class="bar-label">Logistic Regression</span><div class="bar-track"><div class="bar-fill kaggle" style="width:83.8%;"></div></div><span class="bar-val">0.838</span></div>
+        <div class="bar-group"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill nhanes" style="width:71.3%;"></div></div><span class="bar-val">0.713</span></div>
+        <div class="bar-group" style="margin-top:var(--s-sm);"><span class="bar-label">Random Forest</span><div class="bar-track"><div class="bar-fill kaggle" style="width:82.4%;"></div></div><span class="bar-val">0.824</span></div>
+        <div class="bar-group"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill nhanes" style="width:72.5%;"></div></div><span class="bar-val">0.725</span></div>
+        <div class="bar-group" style="margin-top:var(--s-sm);"><span class="bar-label">XGBoost</span><div class="bar-track"><div class="bar-fill kaggle" style="width:80.8%;"></div></div><span class="bar-val">0.808</span></div>
+        <div class="bar-group"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill nhanes" style="width:70.9%;"></div></div><span class="bar-val">0.709</span></div>
+      </div>
+
+      <!-- PR-AUC bar chart -->
+      <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">PR-AUC Comparison (In-Domain vs Cross-Domain)</p>
+      <div class="bar-chart mb-xl">
+        <div class="bar-group"><span class="bar-label">Logistic Regression</span><div class="bar-track"><div class="bar-fill kaggle" style="width:71.3%;"></div></div><span class="bar-val">0.214</span></div>
+        <div class="bar-group"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill danger-fill" style="width:26.3%;"></div></div><span class="bar-val">0.079</span></div>
+        <div class="bar-group" style="margin-top:var(--s-sm);"><span class="bar-label">Random Forest</span><div class="bar-track"><div class="bar-fill kaggle" style="width:59.7%;"></div></div><span class="bar-val">0.179</span></div>
+        <div class="bar-group"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill danger-fill" style="width:26%;"></div></div><span class="bar-val">0.078</span></div>
+        <div class="bar-group" style="margin-top:var(--s-sm);"><span class="bar-label">XGBoost</span><div class="bar-track"><div class="bar-fill kaggle" style="width:52.7%;"></div></div><span class="bar-val">0.158</span></div>
+        <div class="bar-group"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill danger-fill" style="width:25.7%;"></div></div><span class="bar-val">0.077</span></div>
+      </div>
+
+      <div class="callout danger">
+        [!] PR-AUC collapsed 51-63% under domain shift. At NHANES prevalence of 4.1%, the cross-domain models achieved only 1.9x the random classifier baseline.
+      </div>
+    </div>
+
+    <!-- Tab: Shift Analysis -->
+    <div class="tab-panel" id="tab-shift" role="tabpanel" aria-labelledby="btn-shift">
+      <div class="table-scroll mb-xl">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="center">KS Statistic</th>
+              <th class="center">KS p-value</th>
+              <th class="center">PSI</th>
+              <th class="center">Severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">age</td>
+              <td class="center">0.207</td>
+              <td class="center mono">2.1 x 10^-63</td>
+              <td class="center">1.007</td>
+              <td class="center severe">Severe</td>
+            </tr>
+            <tr>
+              <td class="mono">gender</td>
+              <td class="center">0.032</td>
+              <td class="center mono">0.057</td>
+              <td class="center">0.004</td>
+              <td class="center stable">Stable</td>
+            </tr>
+            <tr>
+              <td class="mono">bmi</td>
+              <td class="center">0.088</td>
+              <td class="center mono">1.4 x 10^-11</td>
+              <td class="center">0.105</td>
+              <td class="center moderate">Moderate</td>
+            </tr>
+            <tr>
+              <td class="mono">avg_glucose_level</td>
+              <td class="center">0.362</td>
+              <td class="center mono">1.4 x 10^-195</td>
+              <td class="center">1.495</td>
+              <td class="center severe">Severe</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PSI bar -->
+      <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Population Stability Index (PSI)</p>
+      <div class="bar-chart mb-xl">
+        <div class="bar-group"><span class="bar-label">age</span><div class="bar-track"><div class="bar-fill danger-fill" style="width:67.3%;"></div></div><span class="bar-val">1.007</span></div>
+        <div class="bar-group"><span class="bar-label">gender</span><div class="bar-track"><div class="bar-fill" style="width:0.3%; background:var(--success);"></div></div><span class="bar-val">0.004</span></div>
+        <div class="bar-group"><span class="bar-label">bmi</span><div class="bar-track"><div class="bar-fill warn-fill" style="width:7%;"></div></div><span class="bar-val">0.105</span></div>
+        <div class="bar-group"><span class="bar-label">avg_glucose_level</span><div class="bar-track"><div class="bar-fill danger-fill" style="width:99.7%;"></div></div><span class="bar-val">1.495</span></div>
+      </div>
+      <p style="font-size:13px; color:var(--mute); margin-bottom:var(--s-xl);">PSI thresholds: &lt;0.10 Stable | 0.10-0.25 Moderate | &gt;0.25 Severe</p>
+
+      <div class="callout warning">
+        [!] The glucose PSI of 1.495 reflects a definitional mismatch between datasets. Kaggle uses unspecified glucose readings while NHANES uses fasting plasma glucose. This is not a correctable population difference; it is a measurement protocol incompatibility that compromises external validation.
+      </div>
+    </div>
+
+    <!-- Tab: Ablation -->
+    <div class="tab-panel" id="tab-ablation" role="tabpanel" aria-labelledby="btn-ablation">
+      <div class="table-scroll mb-xl">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Configuration (XGBoost)</th>
+              <th class="center">Kaggle AUC</th>
+              <th class="center">NHANES AUC</th>
+              <th class="center">Gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight-row">
+              <td class="strong">Full model</td>
+              <td class="center">0.808</td>
+              <td class="center">0.709</td>
+              <td class="center strong">0.099</td>
+            </tr>
+            <tr>
+              <td>w/o age</td>
+              <td class="center">0.602</td>
+              <td class="center">0.535</td>
+              <td class="center">0.067</td>
+            </tr>
+            <tr>
+              <td>w/o gender</td>
+              <td class="center">0.793</td>
+              <td class="center">0.702</td>
+              <td class="center">0.091</td>
+            </tr>
+            <tr>
+              <td>w/o bmi</td>
+              <td class="center">0.805</td>
+              <td class="center">0.692</td>
+              <td class="center strong" style="color:var(--danger);">0.113</td>
+            </tr>
+            <tr>
+              <td>w/o avg_glucose_level</td>
+              <td class="center">0.780</td>
+              <td class="center">0.683</td>
+              <td class="center">0.097</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout primary">
+        [i] Removing BMI widens the gap to 0.113. Removing glucose reduces it by only 0.002 despite its PSI of 1.495. PSI magnitude does not predict gap contribution.
+      </div>
+    </div>
+
+    <!-- Tab: Concept Shift and Calibration -->
+    <div class="tab-panel" id="tab-concept" role="tabpanel" aria-labelledby="btn-concept">
+      <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Feature Patching -- ROC-AUC Delta</p>
+      <div class="bar-chart mb-md">
+        <div class="bar-group"><span class="bar-label">age</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:100%; opacity:1;"></div></div><span class="bar-val" style="color:var(--danger);">-0.200</span></div>
+        <div class="bar-group"><span class="bar-label">bmi</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:10.5%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.021</span></div>
+        <div class="bar-group"><span class="bar-label">avg_glucose_level</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:8%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.016</span></div>
+        <div class="bar-group"><span class="bar-label">gender</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:0.5%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.001</span></div>
+      </div>
+      <p class="callout danger mb-xxl">
+        [!] All feature-patching deltas are negative. Correcting covariate shift in every feature WORSENS cross-domain performance, confirming concurrent concept shift: P_S(Y|X) is not equal to P_T(Y|X).
+      </p>
+
+      <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Post-hoc Calibration Results</p>
+      <div class="table-scroll mb-xl">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th class="center">Baseline NHANES AUC</th>
+              <th class="center">After Platt Scaling</th>
+              <th class="center">Delta (Platt)</th>
+              <th class="center">After Isotonic</th>
+              <th class="center">Delta (Isotonic)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="strong">Logistic Regression</td>
+              <td class="center">0.713</td>
+              <td class="center">0.713</td>
+              <td class="center">0.000</td>
+              <td class="center">0.713</td>
+              <td class="center">0.000</td>
+            </tr>
+            <tr>
+              <td class="strong">Random Forest</td>
+              <td class="center">0.725</td>
+              <td class="center">0.725</td>
+              <td class="center">0.000</td>
+              <td class="center degrade">0.688</td>
+              <td class="center" style="color:var(--danger);">-0.037</td>
+            </tr>
+            <tr>
+              <td class="strong">XGBoost</td>
+              <td class="center">0.709</td>
+              <td class="center">0.709</td>
+              <td class="center">0.000</td>
+              <td class="center degrade">0.579</td>
+              <td class="center" style="color:var(--danger);">-0.130</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout danger">
+        [!] Isotonic regression on XGBoost caused a catastrophic -0.130 ROC-AUC drop (0.709 to 0.579), demonstrating that post-hoc calibration cannot recover from domain shift.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     INTERACTIVE EXPLORER
+================================================================ -->
+<section id="explorer">
+  <div class="container">
+    <p class="section-label">Interactive Explorer</p>
+    <h2 class="section-heading">Model x Metric Analysis</h2>
+    <p class="section-sub">Select a model and metric to view the detailed cross-domain degradation analysis for that combination.</p>
+
+    <div class="explorer-controls">
+      <select class="explorer-select" id="exp-model" onchange="updateExplorer()" aria-label="Select model">
+        <option value="lr">Logistic Regression</option>
+        <option value="rf">Random Forest</option>
+        <option value="xgb">XGBoost</option>
+      </select>
+      <select class="explorer-select" id="exp-metric" onchange="updateExplorer()" aria-label="Select metric">
+        <option value="roc">ROC-AUC</option>
+        <option value="pr">PR-AUC</option>
+        <option value="brier">Brier Score</option>
+        <option value="ece">ECE</option>
+      </select>
+    </div>
+
+    <div class="explorer-result" id="explorer-result">
+      <div class="er-numbers">
+        <div>
+          <div class="er-num" id="er-kaggle">0.838</div>
+          <div class="er-lbl">Kaggle (in-domain)</div>
+        </div>
+        <div>
+          <div class="er-num er-gap" id="er-nhanes">0.713</div>
+          <div class="er-lbl">NHANES (cross-domain)</div>
+        </div>
+        <div>
+          <div class="er-num er-gap" id="er-delta">-14.9%</div>
+          <div class="er-lbl">Change</div>
+        </div>
+      </div>
+      <p class="er-body" id="er-body">Logistic Regression achieved ROC-AUC of 0.838 in-domain (Kaggle). Under domain shift, this dropped to 0.713 on NHANES, a 14.9% reduction. The non-overlapping 95% bootstrap confidence intervals (0.788-0.878 vs 0.680-0.753) confirm this degradation is statistically significant.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     METHODOLOGY
+================================================================ -->
+<section id="methodology">
+  <div class="container">
+    <p class="section-label">Methodology</p>
+    <h2 class="section-heading">Experimental Protocol</h2>
+
+    <div id="faq-list">
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Study Design
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">This study follows a source-only training protocol: all three classifiers were trained exclusively on the Kaggle Stroke Prediction Dataset and evaluated on NHANES 2021-2023 without any retraining, fine-tuning, or domain adaptation. This simulates the real-world scenario where a model developed on one dataset is deployed directly to a new clinical population.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Datasets
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">The Kaggle Stroke Prediction Dataset (N=5,109, stroke prevalence 4.87%) served as the source domain. NHANES 2021-2023 (N=3,167, stroke prevalence 4.10%) served as the target domain. NHANES is a nationally representative health survey conducted by the CDC using stratified, multi-stage probability sampling.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Feature Harmonisation
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">Four features were harmonised across datasets: age, gender, BMI, and average glucose level. The primary confound is glucose measurement -- Kaggle contains unspecified glucose readings while NHANES reports fasting plasma glucose (LBXGLU). This definitional mismatch is the primary source of the 1.495 PSI observed for glucose.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Models and Hyperparameters
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">Three classifiers were evaluated: Logistic Regression (C=1.0, max_iter=1000), Random Forest (n_estimators=200, max_depth=10, min_samples_leaf=5), and XGBoost (n_estimators=200, max_depth=4, learning_rate=0.1, scale_pos_weight=19.5). SMOTE oversampling was applied to the training fold only.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Evaluation Protocol
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">Models were evaluated using ROC-AUC, PR-AUC, Brier score, and Expected Calibration Error (ECE, 10 bins). 95% confidence intervals were computed via 1,000-iteration stratified bootstrap resampling. Non-overlapping CIs between Kaggle and NHANES indicate statistically significant degradation.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Shift Analysis
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">Distribution shift was quantified using the Kolmogorov-Smirnov (KS) test for statistical significance and Population Stability Index (PSI) for magnitude. PSI thresholds: &lt;0.10 stable, 0.10-0.25 moderate, &gt;0.25 severe. A logistic regression domain classifier achieved 82.1% accuracy (random baseline: 50%), confirming the datasets are distinguishable.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Concept Shift Test
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">Feature patching replaces one feature at a time in the NHANES test set with values from the Kaggle distribution, then re-evaluates model performance. If performance improves (positive delta), the shift in that feature was the cause of degradation. All-negative deltas indicate concurrent concept shift: the learned feature-outcome relationships have changed across populations.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-toggle" onclick="toggleFaq(this)" aria-expanded="false">
+          <span class="marker">+</span>Post-hoc Calibration
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">Platt scaling (logistic recalibration) and isotonic regression were applied as post-hoc calibration methods. Platt scaling produced no change for any model. Isotonic regression was neutral for Logistic Regression, caused a -0.037 drop for Random Forest, and a catastrophic -0.130 drop for XGBoost (0.709 to 0.579), demonstrating that miscalibration under domain shift is not recoverable by post-hoc methods.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MATHEMATICAL FORMULATION
+================================================================ -->
+<section id="math">
+  <div class="container">
+    <p class="section-label">Mathematical Formulation</p>
+    <h2 class="section-heading">Formal Definitions</h2>
+    <p class="section-sub">Mathematical definitions of all key quantities used in this study. All metrics include 95% bootstrap confidence intervals computed over 1,000 stratified resamples.</p>
+
+    <!-- Notation reference -->
+    <div class="notation-table mb-xxl">
+      <div class="nt-header">Notation Reference (Table 2)</div>
+      <div class="nt-row"><span class="nt-sym">S</span><span class="nt-desc">Source domain (Kaggle Stroke Prediction Dataset)</span></div>
+      <div class="nt-row"><span class="nt-sym">T</span><span class="nt-desc">Target domain (NHANES 2021-2023)</span></div>
+      <div class="nt-row"><span class="nt-sym">f_S</span><span class="nt-desc">Classifier trained on source domain S only</span></div>
+      <div class="nt-row"><span class="nt-sym">P(X)</span><span class="nt-desc">Marginal feature distribution</span></div>
+      <div class="nt-row"><span class="nt-sym">P(Y|X)</span><span class="nt-desc">Conditional label distribution (stroke given features)</span></div>
+      <div class="nt-row"><span class="nt-sym">M(f,D)</span><span class="nt-desc">Performance metric of model f on dataset D</span></div>
+      <div class="nt-row"><span class="nt-sym">Ei, Ai</span><span class="nt-desc">Expected (Kaggle) and Actual (NHANES) proportion in PSI bin i</span></div>
+      <div class="nt-row"><span class="nt-sym">Pn, Rn</span><span class="nt-desc">Precision and recall at threshold n</span></div>
+      <div class="nt-row"><span class="nt-sym">Sk</span><span class="nt-desc">Set of predictions falling in calibration bin k</span></div>
+      <div class="nt-row"><span class="nt-sym">B</span><span class="nt-desc">Number of bootstrap resamples (B = 1,000)</span></div>
+      <div class="nt-row"><span class="nt-sym">theta_b</span><span class="nt-desc">Metric value on b-th bootstrap resample</span></div>
+    </div>
+
+    <!-- Equation cards -->
+    <div class="eq-grid">
+      <div class="eq-card">
+        <span class="eq-number">Eq. 1</span>
+        <div class="eq-label">Covariate Shift</div>
+        <p class="eq-desc">Covariate shift occurs when the marginal feature distribution differs between source and target domains while the conditional label distribution remains stable.</p>
+        <div class="eq-formula">$$P_S(X) \neq P_T(X) \quad \text{but} \quad P_S(Y|X) = P_T(Y|X)$$</div>
+        <p class="eq-note">S = source domain (Kaggle), T = target domain (NHANES)</p>
+      </div>
+      <div class="eq-card">
+        <span class="eq-number">Eq. 2</span>
+        <div class="eq-label">Concept Shift</div>
+        <p class="eq-desc">Concept shift occurs when the relationship between features and labels differs across domains. The decision boundary itself has changed.</p>
+        <div class="eq-formula">$$P_S(Y|X) \neq P_T(Y|X)$$</div>
+        <p class="eq-note">All-negative feature-patching deltas confirm concurrent concept shift in this study</p>
+      </div>
+      <div class="eq-card">
+        <span class="eq-number">Eq. 3</span>
+        <div class="eq-label">Population Stability Index (PSI)</div>
+        <p class="eq-desc">Quantifies distributional shift magnitude using binned proportions. Thresholds: &lt;0.10 stable, 0.10-0.20 moderate, &gt;0.20 severe.</p>
+        <div class="eq-formula">$$\text{PSI} = \sum_{i=1}^{M}(E_i - A_i)\ln\!\left(\frac{E_i}{A_i}\right)$$</div>
+        <p class="eq-note">Ei = Kaggle bin proportion, Ai = NHANES bin proportion, M = 10 bins</p>
+      </div>
+      <div class="eq-card">
+        <span class="eq-number">Eq. 4</span>
+        <div class="eq-label">Generalisation Gap</div>
+        <p class="eq-desc">Measures performance loss under domain shift, where the model is trained on source domain only.</p>
+        <div class="eq-formula">$$\Delta = \mathcal{M}(f_{\mathcal{S}}, \mathcal{S}_{\text{test}}) - \mathcal{M}(f_{\mathcal{S}}, \mathcal{T})$$</div>
+        <p class="eq-note">f_S = model trained on S only, M = performance metric, T = target NHANES</p>
+      </div>
+      <div class="eq-card">
+        <span class="eq-number">Eq. 5</span>
+        <div class="eq-label">Average Precision (PR-AUC)</div>
+        <p class="eq-desc">Preferred over ROC-AUC as it is sensitive to minority-class detection failure under class imbalance. The random baseline equals the class prevalence (~0.041 for NHANES).</p>
+        <div class="eq-formula">$$\text{AP} = \sum_{n}(R_n - R_{n-1})P_n$$</div>
+        <p class="eq-note">Pn = precision at threshold n, Rn = recall at threshold n</p>
+      </div>
+      <div class="eq-card">
+        <span class="eq-number">Eq. 6</span>
+        <div class="eq-label">Expected Calibration Error (ECE)</div>
+        <p class="eq-desc">Uses 10 uniform bins. ECE &gt;0.40 means predicted probabilities deviate from true frequencies by over 40 percentage points on average.</p>
+        <div class="eq-formula">$$\text{ECE} = \sum_{k=1}^{K}\frac{|S_k|}{n}\left|\text{acc}(S_k)-\text{conf}(S_k)\right|$$</div>
+        <p class="eq-note">acc(Sk) = fraction of positives in bin, conf(Sk) = mean predicted probability, K = 10</p>
+      </div>
+      <div class="eq-card">
+        <span class="eq-number">Eq. 7</span>
+        <div class="eq-label">Bootstrap Confidence Intervals</div>
+        <p class="eq-desc">B = 1,000 stratified resamples (seed = 42). Non-overlapping CIs between Kaggle and NHANES confirm statistically significant degradation.</p>
+        <div class="eq-formula">$$\text{CI}_{95\%} = [\hat{\theta}_{0.025}, \hat{\theta}_{0.975}]$$</div>
+        <p class="eq-note">theta_b = metric on b-th bootstrap resample, B = 1,000 resamples</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     ALGORITHMS
+================================================================ -->
+<section id="algorithms">
+  <div class="container">
+    <p class="section-label">Algorithms</p>
+    <h2 class="section-heading">Experimental Pipeline Pseudocode</h2>
+    <p class="section-sub">Two algorithms govern the experimental pipeline. Algorithm 1 covers the complete evaluation workflow. Algorithm 2 isolates each feature's contribution to the generalisation gap and provides empirical evidence of concept shift.</p>
+
+    <!-- Algorithm 1 -->
+    <div class="code-block mb-xl">
+      <div class="code-block-header">
+        <div>
+          <span class="title">Algorithm 1</span>
+          <span class="subtitle"> -- Cross-Domain Generalisation Evaluation</span>
+        </div>
+        <button class="copy-btn" onclick="copyCode('alg1-code', this)">Copy</button>
+      </div>
+      <pre id="alg1-code">Input:
+  Kaggle dataset, NHANES dataset
+  features = {age, gender, bmi, avg_glucose_level}
+  classifiers = {Logistic Regression, Random Forest, XGBoost}
+
+Output:
+  ROC-AUC, PR-AUC, Brier Score, ECE
+  (with 95% confidence intervals for both domains)
+
+---------------------------------------------------------
+1.  Map shared features across Kaggle and NHANES
+
+2.  Split Kaggle: 70% training, 30% test
+      (stratified, seed = 42)
+
+3.  Fit imputer and scaler on Kaggle training set ONLY
+
+4.  Apply fitted imputer and scaler to:
+      - Kaggle test set
+      - NHANES cohort  &lt;- no parameters re-estimated
+
+5.  for each classifier:
+      Train on Kaggle training set with class balancing
+
+6.  for each classifier:
+      Generate predicted probabilities on:
+        - Kaggle test set
+        - NHANES cohort
+      Compute ROC-AUC, PR-AUC, Brier Score, ECE
+      Compute 95% confidence intervals
+        via 1,000 bootstrap resamples (seed = 42)
+      Compute generalisation gap
+        = Kaggle AUC - NHANES AUC
+
+7.  for each feature:
+      Compute KS statistic and PSI
+        between Kaggle train and NHANES
+      Train domain classifier
+        (Kaggle vs. NHANES samples)
+
+8.  for each classifier:
+      Apply Platt scaling on Kaggle training set
+        evaluate on NHANES
+      Apply isotonic regression on Kaggle training set
+        evaluate on NHANES
+
+Return: all metrics, confidence intervals,
+        shift statistics, adaptation results</pre>
+    </div>
+
+    <!-- Algorithm 2 -->
+    <div class="code-block mb-xl">
+      <div class="code-block-header">
+        <div>
+          <span class="title">Algorithm 2</span>
+          <span class="subtitle"> -- Shift Contribution Analysis (Feature Patching)</span>
+        </div>
+        <button class="copy-btn" onclick="copyCode('alg2-code', this)">Copy</button>
+      </div>
+      <pre id="alg2-code">Input:
+  Trained XGBoost model  f_S
+  Kaggle training set (scaled)
+  NHANES test set (scaled)
+  NHANES labels
+
+Output:
+  Delta AUC per feature when covariate shift is corrected
+
+---------------------------------------------------------
+1.  Compute baseline AUC on NHANES using f_S
+
+2.  for each feature f in {age, gender, bmi, glucose}:
+      Copy the NHANES test set -&gt; X_patched
+      Replace column f in X_patched with values
+        sampled from the Kaggle training distribution
+      Compute patched_AUC = AUC(f_S, X_patched)
+      Compute delta = patched_AUC - baseline_AUC
+
+3.  if ALL delta values are negative:
+      -&gt; Concept shift confirmed
+        (correcting covariate shift WORSENS performance,
+         meaning P_S(Y|X) != P_T(Y|X))
+
+Return:
+  feature_name, patched_AUC, delta  for each feature</pre>
+    </div>
+
+    <!-- Algorithm 2 results table -->
+    <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Empirical Results -- XGBoost Feature Patching</p>
+    <div class="table-scroll mb-md">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th class="center">Baseline AUC</th>
+            <th class="center">Patched AUC</th>
+            <th class="center">Delta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">age</td>
+            <td class="center">0.709</td>
+            <td class="center">0.509</td>
+            <td class="center" style="color:var(--danger); font-weight:700;">-0.200</td>
+          </tr>
+          <tr>
+            <td class="mono">bmi</td>
+            <td class="center">0.709</td>
+            <td class="center">0.688</td>
+            <td class="center" style="color:var(--danger); font-weight:700;">-0.021</td>
+          </tr>
+          <tr>
+            <td class="mono">avg_glucose_level</td>
+            <td class="center">0.709</td>
+            <td class="center">0.693</td>
+            <td class="center" style="color:var(--danger); font-weight:700;">-0.016</td>
+          </tr>
+          <tr>
+            <td class="mono">gender</td>
+            <td class="center">0.709</td>
+            <td class="center">0.708</td>
+            <td class="center" style="color:var(--danger); font-weight:700;">-0.001</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px; color:var(--body);">
+      <strong style="color:var(--danger);">All deltas are negative</strong> -- confirming concurrent concept shift. Correcting covariate shift in every feature worsens cross-domain performance, proving that P_S(Y|X) is not equal to P_T(Y|X).
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================
+     COMPARATIVE ANALYSIS
+================================================================ -->
+<section id="comparative">
+  <div class="container">
+    <p class="section-label">Comparative Analysis</p>
+    <h2 class="section-heading">This Study vs. Prior Work</h2>
+    <p class="section-sub">Comparison across key experimental dimensions between the present study and two leading prior works on the Kaggle Stroke Prediction Dataset (Table 6 from manuscript).</p>
+
+    <div class="table-scroll mb-xxl">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th class="this">This Study</th>
+            <th>Sutcu et al. (2025)</th>
+            <th>Chakraborty et al. (2024)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dim-col">Training Dataset</td>
+            <td class="this">Kaggle Stroke Prediction (N=5,109)</td>
+            <td>Kaggle Stroke Prediction</td>
+            <td>Kaggle Stroke Prediction</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Evaluation Dataset</td>
+            <td class="this">NHANES 2021-2023 (N=3,167) -- independent national survey</td>
+            <td>Held-out split of Kaggle only</td>
+            <td>Held-out split of Kaggle only</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Cross-Domain Test</td>
+            <td class="this">[+] Yes -- no retraining on target</td>
+            <td>[-] No</td>
+            <td>[-] No</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Best ROC-AUC (in-domain)</td>
+            <td class="this">0.838 (Logistic Regression)</td>
+            <td>0.834 (Gradient Boosting)</td>
+            <td>98.6% accuracy (not AUC)</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Cross-Domain ROC-AUC</td>
+            <td class="this">0.713 (LR) / 0.725 (RF) / 0.709 (XGB)</td>
+            <td>Not reported</td>
+            <td>Not reported</td>
+          </tr>
+          <tr>
+            <td class="dim-col">PR-AUC Reported</td>
+            <td class="this">[+] 0.214 to 0.079 under shift (63% collapse)</td>
+            <td>[-] Not reported</td>
+            <td>[-] Not reported</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Generalisation Gap</td>
+            <td class="this">-0.125 ROC-AUC (non-overlapping 95% CIs)</td>
+            <td>Not applicable</td>
+            <td>Not applicable</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Shift Analysis</td>
+            <td class="this">PSI, KS test, domain classifier, label shift test</td>
+            <td>Not performed</td>
+            <td>Not performed</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Concept Shift Detection</td>
+            <td class="this">[+] Feature patching -- all-negative deltas confirm concept shift</td>
+            <td>[-] Not performed</td>
+            <td>[-] Not performed</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Post-hoc Calibration</td>
+            <td class="this">Platt scaling + Isotonic regression -- no recovery</td>
+            <td>Not evaluated</td>
+            <td>Not evaluated</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Class Imbalance</td>
+            <td class="this">SMOTE + class_weight=balanced</td>
+            <td>Various oversampling</td>
+            <td>PCA + ensemble stacking</td>
+          </tr>
+          <tr>
+            <td class="dim-col">Bootstrap CIs</td>
+            <td class="this">[+] 1,000 stratified resamples</td>
+            <td>[-] Not reported</td>
+            <td>[-] Not reported</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Key Findings from Comparison</p>
+    <div class="list-row">
+      <span class="marker">[!]</span>
+      <span><span class="label">63% PR-AUC Collapse Invisible to ROC-AUC.</span> <span class="desc">Sutcu et al. report gradient boosting ROC-AUC of 0.834 on in-domain holdout. This study achieves 0.838 in-domain and 0.713 cross-domain. The 0.125 absolute gap -- confirmed by non-overlapping CIs -- is the study's central empirical contribution. Sutcu et al. report no PR-AUC; this study reveals a collapse from 0.214 to 0.079, invisible to ROC-AUC alone.</span></span>
+    </div>
+    <div class="list-row">
+      <span class="marker">[!]</span>
+      <span><span class="label">High Accuracy Does Not Imply External Validity.</span> <span class="desc">The 98.6% in-domain accuracy reported by Chakraborty et al. (2024) on the same Kaggle data reinforces the core finding: held-out accuracy provides no reliable indication of performance on an independent population.</span></span>
+    </div>
+    <div class="list-row">
+      <span class="marker">[+]</span>
+      <span><span class="label">PR-AUC Reveals What ROC-AUC Conceals.</span> <span class="desc">In-domain models achieve 3.2x-4.4x the random baseline PR-AUC. Cross-domain models achieve only 1.9x, indicating near-trivial stroke detection utility in the target population. This failure mode is entirely invisible to ROC-AUC analysis alone.</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     CONCLUSION AND FUTURE WORK
+================================================================ -->
+<section id="conclusion">
+  <div class="container">
+    <p class="section-label">Conclusion</p>
+    <h2 class="section-heading">What This Study Demonstrates</h2>
+    <p class="section-sub">Stroke risk classifiers trained on the Kaggle benchmark exhibit statistically significant and practically consequential performance degradation when applied without retraining to NHANES 2021-2023. Feature-patching confirms concurrent concept shift, and post-hoc calibration provides no recovery under these conditions.</p>
+
+    <div class="conclusion-grid mb-xxl">
+      <div class="conclusion-card">
+        <div class="c-num">01</div>
+        <div class="c-stat">12-15%</div>
+        <div class="c-stat-lbl">ROC-AUC decline</div>
+        <h3>External Validation Is Non-Negotiable</h3>
+        <p>In-domain hold-out evaluation is insufficient to establish clinical applicability. External validation against an independent, population-representative dataset is a necessary condition -- not an optional supplement.</p>
+      </div>
+      <div class="conclusion-card">
+        <div class="c-num">02</div>
+        <div class="c-stat">51-63%</div>
+        <div class="c-stat-lbl">PR-AUC collapse</div>
+        <h3>Report PR-AUC as Primary Metric</h3>
+        <p>PR-AUC should be reported as the primary metric for rare-event prediction tasks. It is sensitive to the failure mode that domain shift induces while ROC-AUC is not -- and the 51-63% PR-AUC collapse is entirely invisible to ROC-AUC analysis alone.</p>
+      </div>
+      <div class="conclusion-card">
+        <div class="c-num">03</div>
+        <div class="c-stat">PSI 1.495</div>
+        <div class="c-stat-lbl">glucose shift (irremediable)</div>
+        <h3>Document Measurement Protocols Rigorously</h3>
+        <p>Feature-level measurement documentation -- specifying the exact measurement protocol for every variable -- is a methodological prerequisite for valid cross-dataset comparisons. The glucose PSI of 1.495 reflects a definitional mismatch that no adaptation technique can remediate.</p>
+      </div>
+    </div>
+
+    <!-- Future Work -->
+    <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Open Research Directions</p>
+    <p class="section-sub">These findings collectively point toward a standard where clinical prediction models are evaluated and deployed with the rigour applied to pharmaceutical trials -- where independent external validation is a prerequisite, not an afterthought.</p>
+
+    <div class="future-grid">
+      <div class="future-card">
+        <span class="future-icon">[+]</span>
+        <div>
+          <h4>Broader Cohort Coverage</h4>
+          <p>Extend the NHANES cohort to include non-fasting participants and alternative surveys, exposing cross-domain failure patterns across more diverse demographics and measurement contexts.</p>
+        </div>
+      </div>
+      <div class="future-card">
+        <span class="future-icon">[+]</span>
+        <div>
+          <h4>Feature Provenance Protocol</h4>
+          <p>Develop a structured harmonisation protocol formally mapping clinical measurement definitions across widely used stroke and cardiovascular benchmarks -- enabling reproducible, scientifically defensible cross-dataset comparisons.</p>
+        </div>
+      </div>
+      <div class="future-card">
+        <span class="future-icon">[+]</span>
+        <div>
+          <h4>Representation-Level Adaptation</h4>
+          <p>Post-hoc calibration proves ineffective under concept shift. Density ratio estimation and importance reweighting offer potential cross-domain performance recovery without requiring labelled target data.</p>
+        </div>
+      </div>
+      <div class="future-card">
+        <span class="future-icon">[+]</span>
+        <div>
+          <h4>Causal Stability Analysis</h4>
+          <p>Causal stability analysis (Subbaswamy and Saria, 2020) provides a principled path toward identifying features whose relationship with stroke outcomes remains invariant across populations -- enabling models that generalise by construction rather than coincidence.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     ABOUT AND CITATION
+================================================================ -->
+<section id="about">
+  <div class="container">
+    <p class="section-label">About and Citation</p>
+    <h2 class="section-heading">Cite This Work</h2>
+
+    <div class="author-row">
+      <div class="author-initials">SP</div>
+      <div>
+        <div class="author-name">Swayam Patnaik</div>
+        <div class="author-role">B.Tech CSE (Data Science) -- NIST University, Berhampur, India</div>
+      </div>
+    </div>
+
+    <p class="section-label" style="font-size:14px; margin-bottom:var(--s-sm);">BibTeX Citation</p>
+    <div class="snippet mb-md">
+      <code>@article{patnaik2025stroke ...}</code>
+      <button onclick="copyBibtex(this)">Copy BibTeX</button>
+    </div>
+    <div class="bibtex-block" id="bibtex-full">@article{patnaik2025stroke,
+  title     = {Cross-Dataset Generalisation and Calibration Analysis
+               of Stroke Risk Prediction Models},
+  author    = {Patnaik, Swayam},
+  year      = {2025},
+  note      = {Preprint -- not yet published},
+  institution = {NIST University, Berhampur, India},
+  abstract  = {This study evaluates cross-domain generalisation failure
+               of three stroke risk classifiers trained on Kaggle and
+               evaluated zero-shot on NHANES 2021-2023. PR-AUC collapsed
+               51-63% under domain shift. Feature-patching confirmed
+               concurrent concept shift. Post-hoc calibration provided
+               no recovery.},
+  keywords  = {stroke prediction, dataset shift, generalisation,
+               calibration, PR-AUC, covariate shift, concept shift,
+               machine learning, clinical AI}
+}</div>
+
+    <div class="mt-xxl">
+      <p class="section-label" style="font-size:14px; margin-bottom:var(--s-md);">Links</p>
+      <div class="list-row">
+        <span class="marker">[+]</span>
+        <a href="https://github.com/patnaikswayam131/CROSS-DATASET-GENERALISATION-AND-CALIBRATION-ANALYSIS-OF-STROKE-RISK-PREDICTION-MODELS" target="_blank" rel="noopener noreferrer">GitHub Repository -- Code, Data, Outputs</a>
+      </div>
+      <div class="list-row">
+        <span class="marker">[-]</span>
+        <span style="color:var(--mute);">Paper -- Coming Soon (not yet published)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+<footer id="site-footer">
+  <div class="container">
+    <div class="footer-links">
+      <a href="https://github.com/patnaikswayam131/CROSS-DATASET-GENERALISATION-AND-CALIBRATION-ANALYSIS-OF-STROKE-RISK-PREDICTION-MODELS" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="#methodology">Methodology</a>
+      <a href="#results">Results</a>
+      <a href="#about">Citation</a>
+      <a href="#math">Math</a>
+    </div>
+    <div class="footer-bottom">
+      <span>Swayam Patnaik -- NIST University, Berhampur, India -- 2025</span>
+      <span style="color:var(--ash);">Cross-Dataset Generalisation and Calibration Analysis of Stroke Risk Prediction Models</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+  /* ---- Tab switching ---- */
+  function switchTab(id) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.id === 'btn-' + id);
+      btn.setAttribute('aria-selected', btn.id === 'btn-' + id);
+    });
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+      panel.classList.toggle('active', panel.id === 'tab-' + id);
+    });
+  }
+
+  /* ---- FAQ accordion ---- */
+  function toggleFaq(btn) {
+    const body = btn.nextElementSibling;
+    const marker = btn.querySelector('.marker');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    marker.textContent = isOpen ? '+' : '-';
+    btn.setAttribute('aria-expanded', !isOpen);
+  }
+
+  /* ---- Copy code ---- */
+  function copyCode(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '[+] Copied';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  }
+
+  /* ---- Copy BibTeX ---- */
+  function copyBibtex(btn) {
+    const text = document.getElementById('bibtex-full').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy BibTeX'; }, 2000);
+    });
+  }
+
+  /* ---- Interactive Explorer ---- */
+  const EXPLORER_DATA = {
+    lr: {
+      roc:   { k: '0.838', n: '0.713', delta: '-14.9%', body: 'Logistic Regression achieved ROC-AUC of 0.838 in-domain (Kaggle). Under domain shift, this dropped to 0.713 on NHANES, a 14.9% reduction. The non-overlapping 95% bootstrap confidence intervals (0.788-0.878 vs 0.680-0.753) confirm this degradation is statistically significant.' },
+      pr:    { k: '0.214', n: '0.079', delta: '-63.1%', body: 'Logistic Regression achieved PR-AUC of 0.214 in-domain. Under domain shift, this collapsed to 0.079, a 63.1% reduction. At 4.1% NHANES prevalence, this represents only 1.9x the random baseline of 0.041.' },
+      brier: { k: '0.175', n: '0.269', delta: '+53.7%', body: 'Logistic Regression achieved a Brier score of 0.175 in-domain. On NHANES, this worsened to 0.269, a 53.7% increase indicating substantially degraded probability calibration under domain shift.' },
+      ece:   { k: '0.410', n: '0.445', delta: '+8.5%',  body: 'Logistic Regression showed ECE of 0.410 in-domain, already indicating poor calibration. On NHANES, ECE increased to 0.445, a further 8.5% degradation. Expected calibration error above 0.40 means predicted probabilities deviate from true frequencies by over 40 percentage points on average.' },
+    },
+    rf: {
+      roc:   { k: '0.824', n: '0.725', delta: '-12.0%', body: 'Random Forest achieved ROC-AUC of 0.824 in-domain. Under domain shift, this dropped to 0.725 on NHANES, a 12.0% reduction. Random Forest showed the best cross-domain ROC-AUC among all three models.' },
+      pr:    { k: '0.179', n: '0.078', delta: '-56.4%', body: 'Random Forest achieved PR-AUC of 0.179 in-domain. Under domain shift, this collapsed to 0.078, a 56.4% reduction. Despite having the best cross-domain ROC-AUC, its PR-AUC performance is essentially indistinguishable from the other models on NHANES.' },
+      brier: { k: '0.132', n: '0.185', delta: '+40.2%', body: 'Random Forest achieved a Brier score of 0.132 in-domain. On NHANES, this worsened to 0.185, a 40.2% increase. The degradation is more moderate than Logistic Regression but still clinically significant.' },
+      ece:   { k: '0.368', n: '0.399', delta: '+8.4%',  body: 'Random Forest showed ECE of 0.368 in-domain, the best calibration among all models. On NHANES, ECE increased to 0.399, an 8.4% degradation that brings it closer to the other models calibration levels.' },
+    },
+    xgb: {
+      roc:   { k: '0.808', n: '0.709', delta: '-12.3%', body: 'XGBoost achieved ROC-AUC of 0.808 in-domain. Under domain shift, this dropped to 0.709 on NHANES, a 12.3% reduction. While this appears comparable to other models, XGBoost showed the most dramatic failure in other metrics.' },
+      pr:    { k: '0.158', n: '0.077', delta: '-51.3%', body: 'XGBoost achieved PR-AUC of 0.158 in-domain. Under domain shift, this collapsed to 0.077, a 51.3% reduction. At 4.1% prevalence, this offers only 1.9x the random classifier baseline -- near-trivial minority-class detection.' },
+      brier: { k: '0.098', n: '0.123', delta: '+25.5%', body: 'XGBoost achieved the best Brier score of 0.098 in-domain. On NHANES, this worsened to 0.123, a 25.5% increase. Despite being the least degraded Brier score, the calibration analysis reveals this masks severe issues.' },
+      ece:   { k: '0.399', n: '0.429', delta: '+7.5%',  body: 'XGBoost showed ECE of 0.399 in-domain. On NHANES, ECE increased to 0.429, a 7.5% degradation. Post-hoc calibration via isotonic regression catastrophically worsened ROC-AUC from 0.709 to 0.579 (delta = -0.130), demonstrating that miscalibration under domain shift is not recoverable.' },
+    },
+  };
+
+  function updateExplorer() {
+    const model  = document.getElementById('exp-model').value;
+    const metric = document.getElementById('exp-metric').value;
+    const d = EXPLORER_DATA[model][metric];
+    document.getElementById('er-kaggle').textContent = d.k;
+    document.getElementById('er-nhanes').textContent = d.n;
+    document.getElementById('er-delta').textContent  = d.delta;
+    document.getElementById('er-body').textContent   = d.body;
+  }
+</script>
+
+</body>
 </html>
