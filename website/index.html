@@ -1341,9 +1341,18 @@
 <!-- ================================================================
      SCROLL PROGRESS BAR
 ================================================================ -->
-<div id="scroll-progress-bar" style="position: fixed; top: 0; left: 0; width: 100%; background: var(--ink); color: var(--canvas); z-index: 9999; font-family: var(--font); font-size: 12px; padding: 4px 16px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--hairline-strong);">
+<div id="scroll-progress-bar" style="position: fixed; bottom: 0; left: 0; width: 100%; background: var(--ink); color: var(--canvas); z-index: 9999; font-family: var(--font); font-size: 12px; padding: 4px 16px; display: flex; justify-content: space-between; border-top: 1px solid var(--hairline-strong);">
   <span>[PROCESS] stroke_manuscript.exe</span>
   <span id="scroll-text">Reading... [--------------------] 0%</span>
+</div>
+
+<!-- ================================================================
+     MATRIX BACKGROUND & BOOT SEQUENCE
+================================================================ -->
+<canvas id="matrix-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.03; pointer-events: none;"></canvas>
+
+<div id="boot-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #0f0; z-index: 100000; font-family: monospace; font-size: 14px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-end;">
+  <div id="boot-log" style="white-space: pre-wrap;"></div>
 </div>
 
 <!-- ================================================================
@@ -1385,6 +1394,7 @@
       <a href="#about">Cite</a>
     </div>
     <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+      <button id="raw-toggle" onclick="toggleRaw()" aria-label="Toggle raw data view" title="Toggle raw JSON view" style="background: none; border: 1px solid var(--hairline); color: var(--ink); padding: 2px 6px; font-family: var(--font); font-size: 11px; cursor: pointer;">[RAW]</button>
       <button id="dark-toggle" onclick="toggleDark()" aria-label="Toggle dark mode" title="Toggle dark mode (D)">[D]</button>
       <a href="https://github.com/patnaikswayam131/CROSS-DATASET-GENERALISATION-AND-CALIBRATION-ANALYSIS-OF-STROKE-RISK-PREDICTION-MODELS" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a>
     </div>
@@ -1981,6 +1991,12 @@
         <div class="bar-group"><span class="bar-label">age</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:100%; opacity:1;"></div></div><span class="bar-val" style="color:var(--danger);">-0.200</span></div>
         <div class="bar-group"><span class="bar-label">bmi</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:10.5%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.021</span></div>
         <div class="bar-group"><span class="bar-label">avg_glucose_level</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:8%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.016</span></div>
+        <div class="hero-stats-strip">
+        <div class="stat-item"><span class="stat-key">n_source</span><span class="stat-val">4,909</span></div>
+        <div class="stat-item"><span class="stat-key">n_target</span><span class="stat-val">8,276</span></div>
+        <div class="stat-item"><span class="stat-key">roc_delta</span><span class="stat-val hack-num">-0.130</span></div>
+        <div class="stat-item"><span class="stat-key">prauc_delta</span><span class="stat-val hack-num">-0.081</span></div>
+      </div>
         <div class="bar-group"><span class="bar-label">gender</span><div class="bar-track" style="background:rgba(255,59,48,0.1);"><div class="bar-fill danger-fill" style="width:0.5%;"></div></div><span class="bar-val" style="color:var(--danger);">-0.001</span></div>
       </div>
       <p class="callout danger mb-xxl">
@@ -3092,6 +3108,148 @@ India, 2025. [Preprint, not yet published.]</div>
     
     const output = document.getElementById('demo-output');
     output.innerHTML = `> Computing feature weights...\n> In-Domain Risk (Kaggle Calibration): <span style="color:var(--danger)">${(inDomain*100).toFixed(1)}%</span>\n> Cross-Domain Risk (NHANES Calibration): <span style="color:var(--warning)">${(crossDomain*100).toFixed(1)}%</span>\n> [!] WARNING: Domain shift detected. Calibration collapsed.`;
+  }
+  /* ================================================================
+     BOOT SEQUENCE
+  ================================================================ */
+  const bootScreen = document.getElementById('boot-screen');
+  const bootLog = document.getElementById('boot-log');
+  const bootMessages = [
+    "> Initializing kernel... OK",
+    "> Mounting dataset: Kaggle Stroke Prediction... OK",
+    "> Mounting dataset: NHANES 2021-2023... OK",
+    "> Loading model weights... SUCCESS",
+    "> Establishing cross-domain evaluation pipeline...",
+    "> Warning: Distribution shift detected.",
+    "> Launching stroke_manuscript.exe..."
+  ];
+  let bootIndex = 0;
+  function runBoot() {
+    if (bootIndex < bootMessages.length) {
+      bootLog.textContent += bootMessages[bootIndex] + "\n";
+      bootIndex++;
+      setTimeout(runBoot, Math.random() * 150 + 50);
+    } else {
+      setTimeout(() => {
+        bootScreen.style.transition = "opacity 0.4s";
+        bootScreen.style.opacity = "0";
+        setTimeout(() => bootScreen.style.display = "none", 400);
+      }, 300);
+    }
+  }
+  window.addEventListener('DOMContentLoaded', runBoot);
+
+  /* ================================================================
+     MATRIX BACKGROUND
+  ================================================================ */
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = Array.from({length: Math.floor(columns)}).fill(1);
+  
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(253, 252, 252, 0.05)";
+    if (document.body.classList.contains('dark-mode')) {
+      ctx.fillStyle = "rgba(18, 18, 18, 0.05)";
+    }
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = document.body.classList.contains('dark-mode') ? "#fff" : "#000";
+    ctx.font = fontSize + "px monospace";
+    
+    for (let i = 0; i < drops.length; i++) {
+      const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+  setInterval(drawMatrix, 50);
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  /* ================================================================
+     HACKABLE NUMBERS
+  ================================================================ */
+  const hackNums = document.querySelectorAll('.hack-num');
+  hackNums.forEach(num => {
+    num.dataset.val = num.innerText;
+    num.style.cursor = 'crosshair';
+    num.style.borderBottom = '1px dotted var(--danger)';
+    num.style.display = 'inline-block';
+    
+    num.addEventListener('mouseenter', () => {
+      let iter = 0;
+      clearInterval(num.interval);
+      num.interval = setInterval(() => {
+        num.innerText = num.dataset.val.split('').map((c) => {
+          if (c === '.' || c === '-' || c === '%') return c;
+          return Math.floor(Math.random() * 10);
+        }).join('');
+        iter++;
+        if (iter > 10) {
+          clearInterval(num.interval);
+          num.innerText = num.dataset.val;
+        }
+      }, 30);
+    });
+  });
+
+  /* ================================================================
+     RAW DATA TOGGLE
+  ================================================================ */
+  let isRawMode = false;
+  function toggleRaw() {
+    isRawMode = !isRawMode;
+    const tables = document.querySelectorAll('table');
+    const rawBtn = document.getElementById('raw-toggle');
+    if(rawBtn) {
+        rawBtn.style.background = isRawMode ? 'var(--ink)' : 'none';
+        rawBtn.style.color = isRawMode ? 'var(--canvas)' : 'var(--ink)';
+    }
+
+    tables.forEach(table => {
+      if (isRawMode) {
+        if (!table.dataset.raw) {
+          const headers = Array.from(table.querySelectorAll('th')).map(th => th.innerText.trim());
+          const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
+            const cells = Array.from(tr.querySelectorAll('td'));
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = cells[i] ? cells[i].innerText.trim() : '');
+            return obj;
+          });
+          const rawDiv = document.createElement('pre');
+          rawDiv.className = 'raw-data-view code-block';
+          rawDiv.style.padding = '10px';
+          rawDiv.style.overflowX = 'auto';
+          rawDiv.style.fontSize = '12px';
+          rawDiv.style.color = 'var(--success)';
+          rawDiv.style.margin = '0 0 var(--s-md) 0';
+          rawDiv.textContent = JSON.stringify(rows, null, 2);
+          table.parentNode.insertBefore(rawDiv, table.nextSibling);
+          table.dataset.raw = 'true';
+        }
+        table.style.display = 'none';
+        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-view')) {
+          table.nextSibling.style.display = 'block';
+        }
+      } else {
+        table.style.display = 'table';
+        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-view')) {
+          table.nextSibling.style.display = 'none';
+        }
+      }
+    });
   }
 </script>
 
