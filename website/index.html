@@ -1765,7 +1765,10 @@
 <section id="results">
   <div class="container">
     <p class="section-label">Results</p>
-    <h2 class="section-heading decode-text">Performance Under Domain Shift</h2>
+    <div style="display:flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+      <h2 class="section-heading decode-text" style="margin-bottom: var(--s-lg);">Performance Under Domain Shift</h2>
+      <button class="btn-primary" onclick="simulateTests()" id="run-tests-btn" style="margin-bottom: var(--s-lg);">[./run_eval.sh]</button>
+    </div>
 
     <!-- Tabs -->
     <div class="tab-strip" role="tablist" aria-label="Results tabs">
@@ -3189,26 +3192,155 @@ India, 2025. [Preprint, not yet published.]</div>
           });
           const rawDiv = document.createElement('pre');
           rawDiv.className = 'raw-data-view code-block';
-          rawDiv.style.padding = '10px';
+          rawDiv.style.padding = '30px 10px 10px 10px';
           rawDiv.style.overflowX = 'auto';
           rawDiv.style.fontSize = '12px';
           rawDiv.style.color = 'var(--success)';
-          rawDiv.style.margin = '0 0 var(--s-md) 0';
+          rawDiv.style.margin = '0';
           rawDiv.textContent = JSON.stringify(rows, null, 2);
-          table.parentNode.insertBefore(rawDiv, table.nextSibling);
+          
+          const copyBtn = document.createElement('button');
+          copyBtn.innerText = '[COPY]';
+          copyBtn.style.position = 'absolute';
+          copyBtn.style.top = '8px';
+          copyBtn.style.right = '8px';
+          copyBtn.style.background = 'var(--ink)';
+          copyBtn.style.color = 'var(--canvas)';
+          copyBtn.style.border = '1px solid var(--hairline)';
+          copyBtn.style.padding = '2px 6px';
+          copyBtn.style.fontSize = '10px';
+          copyBtn.style.fontFamily = 'var(--font)';
+          copyBtn.style.cursor = 'pointer';
+          copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
+          copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(JSON.stringify(rows, null, 2));
+            copyBtn.innerText = '[COPIED]';
+            setTimeout(() => copyBtn.innerText = '[COPY]', 2000);
+          };
+
+          const rawWrapper = document.createElement('div');
+          rawWrapper.className = 'raw-data-wrapper';
+          rawWrapper.style.position = 'relative';
+          rawWrapper.style.marginBottom = 'var(--s-md)';
+          rawWrapper.appendChild(copyBtn);
+          rawWrapper.appendChild(rawDiv);
+          
+          table.parentNode.insertBefore(rawWrapper, table.nextSibling);
           table.dataset.raw = 'true';
         }
         table.style.display = 'none';
-        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-view')) {
+        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-wrapper')) {
           table.nextSibling.style.display = 'block';
         }
       } else {
         table.style.display = 'table';
-        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-view')) {
+        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-wrapper')) {
           table.nextSibling.style.display = 'none';
         }
       }
     });
+  }
+  /* ================================================================
+     COPY BUTTON FOR EXISTING CODE BLOCKS
+  ================================================================ */
+  document.querySelectorAll('.code-block').forEach(cb => {
+    if (cb.classList.contains('raw-data-view') || cb.id === 'demo') return; // exclude dynamic and demo block
+    
+    // Check if parent is already a wrapper to avoid double-wrapping
+    if (cb.parentNode.classList.contains('code-block-wrapper')) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+    wrapper.style.position = 'relative';
+    cb.parentNode.insertBefore(wrapper, cb);
+    wrapper.appendChild(cb);
+    
+    const copyBtn = document.createElement('button');
+    copyBtn.innerText = '[COPY]';
+    copyBtn.style.position = 'absolute';
+    copyBtn.style.top = '8px';
+    copyBtn.style.right = '8px';
+    copyBtn.style.background = 'var(--ink)';
+    copyBtn.style.color = 'var(--canvas)';
+    copyBtn.style.border = '1px solid var(--hairline)';
+    copyBtn.style.padding = '2px 6px';
+    copyBtn.style.fontSize = '10px';
+    copyBtn.style.fontFamily = 'var(--font)';
+    copyBtn.style.cursor = 'pointer';
+    copyBtn.style.zIndex = '10';
+    
+    copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
+    copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
+    
+    copyBtn.onclick = function() {
+      // get text but ignore any button text if accidentally caught
+      const textToCopy = cb.innerText.replace(/\[COPY\]|\[COPIED\]/g, '').trim();
+      navigator.clipboard.writeText(textToCopy);
+      copyBtn.innerText = '[COPIED]';
+      setTimeout(() => copyBtn.innerText = '[COPY]', 2000);
+    };
+    wrapper.appendChild(copyBtn);
+  });
+
+  /* ================================================================
+     RUN TESTS SIMULATION
+  ================================================================ */
+  function simulateTests() {
+    const btn = document.getElementById('run-tests-btn');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    btn.innerText = '[RUNNING...]';
+    
+    // Auto-scroll to results tab
+    document.getElementById('results').scrollIntoView({behavior: 'smooth', block: 'start'});
+    
+    // Find viable targets (td, stat-vals)
+    const testTargets = [];
+    document.querySelectorAll('.stat-val, td').forEach(el => {
+      // Must not have HTML children (like tooltips) to prevent wiping them out
+      if (el.children.length === 0 && el.innerText.trim() !== '' && !el.classList.contains('hack-num')) {
+        testTargets.push(el);
+      }
+    });
+    
+    let delay = 500;
+    testTargets.forEach((el) => {
+      // 40% chance to be "tested" visually to keep it fast
+      if (Math.random() > 0.6) {
+        setTimeout(() => {
+          const originalColor = el.style.color || '';
+          const originalText = el.innerText;
+          
+          el.style.color = 'var(--warning)';
+          el.innerText = '[TESTING]';
+          
+          setTimeout(() => {
+            el.style.color = originalColor;
+            el.innerText = originalText;
+            
+            const isFail = el.classList.contains('degrade') || originalText.includes('-') || (parseFloat(originalText) < 0.1 && parseFloat(originalText) > 0);
+            const status = document.createElement('span');
+            status.innerText = isFail ? ' [FAIL]' : ' [PASS]';
+            status.style.color = isFail ? 'var(--danger)' : 'var(--success)';
+            status.style.fontSize = '10px';
+            status.style.marginLeft = '4px';
+            el.appendChild(status);
+            
+            setTimeout(() => {
+              if(status.parentNode) status.parentNode.removeChild(status);
+            }, 3000);
+            
+          }, 200 + Math.random() * 300);
+        }, delay);
+        delay += 20 + Math.random() * 50;
+      }
+    });
+    
+    setTimeout(() => {
+      btn.innerText = '[./run_eval.sh]';
+      btn.disabled = false;
+    }, delay + 1000);
   }
 </script>
 
