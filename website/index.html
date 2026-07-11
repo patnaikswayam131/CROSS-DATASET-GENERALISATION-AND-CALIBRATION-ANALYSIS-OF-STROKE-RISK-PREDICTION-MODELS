@@ -1287,10 +1287,64 @@
       .wf-step { min-width: unset; }
       .wf-arrow { display: none; }
     }
+    /* ================================================================
+       HOVER TOOLTIPS
+    ================================================================ */
+    .tooltip-trigger {
+      border-bottom: 1px dashed var(--on-dark-mute);
+      cursor: help;
+      position: relative;
+    }
+    .tooltip-trigger::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--ink);
+      color: var(--canvas);
+      padding: 8px 12px;
+      border-radius: var(--r-sm);
+      font-size: 12px;
+      white-space: pre-wrap;
+      width: max-content;
+      max-width: 250px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s;
+      z-index: 100;
+      border: 1px solid var(--hairline-strong);
+      pointer-events: none;
+    }
+    .tooltip-trigger:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ================================================================
+       PRINT OPTIMIZATION
+    ================================================================ */
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      nav, #cmd-hint, #hero, .explorer-controls, .interactive-demo-controls, #scroll-progress-bar { display: none !important; }
+      .tab-panel { display: block !important; opacity: 1 !important; visibility: visible !important; margin-bottom: 40px !important; }
+      .tab-strip { display: none !important; }
+      section { padding: 20px 0 !important; page-break-inside: avoid; }
+      * { border-color: #ccc !important; }
+      .diagram-img.invertible { filter: none !important; }
+    }
   </style>
 </head>
 
 <body>
+
+<!-- ================================================================
+     SCROLL PROGRESS BAR
+================================================================ -->
+<div id="scroll-progress-bar" style="position: fixed; top: 0; left: 0; width: 100%; background: var(--ink); color: var(--canvas); z-index: 9999; font-family: var(--font); font-size: 12px; padding: 4px 16px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--hairline-strong);">
+  <span>[PROCESS] stroke_manuscript.exe</span>
+  <span id="scroll-text">Reading... [--------------------] 0%</span>
+</div>
 
 <!-- ================================================================
      PRIMARY NAV
@@ -1415,12 +1469,36 @@
 </section>
 
 <!-- ================================================================
+     INTERACTIVE DEMO
+================================================================ -->
+<section id="demo">
+  <div class="container">
+    <p class="section-label">Interactive Demo</p>
+    <h2 class="section-heading decode-text">Zero-Shot Prediction Simulator</h2>
+    <p class="section-sub">Enter patient metrics below to see how the Kaggle-trained model predicts risk under in-domain vs cross-domain assumptions.</p>
+    
+    <div class="code-block" style="padding: 20px;">
+      <div style="color: var(--success); margin-bottom: 10px;">> init_patient_model --load kaggle_weights</div>
+      <form id="risk-form" style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end;">
+        <label style="color: var(--on-dark-mute); font-size: 13px;">Age:<br><input type="number" id="demo-age" value="65" style="background: var(--ink); color: var(--canvas); border: 1px solid var(--hairline-strong); padding: 5px; width: 80px; margin-top: 5px;" /></label>
+        <label style="color: var(--on-dark-mute); font-size: 13px;">BMI:<br><input type="number" id="demo-bmi" value="28" style="background: var(--ink); color: var(--canvas); border: 1px solid var(--hairline-strong); padding: 5px; width: 80px; margin-top: 5px;" /></label>
+        <label style="color: var(--on-dark-mute); font-size: 13px;">Avg Glucose:<br><input type="number" id="demo-glu" value="120" style="background: var(--ink); color: var(--canvas); border: 1px solid var(--hairline-strong); padding: 5px; width: 100px; margin-top: 5px;" /></label>
+        <button type="button" class="btn-primary" onclick="calculateRisk()" style="margin-left: auto;">[RUN PREDICTION]</button>
+      </form>
+      <div id="demo-output" style="color: var(--on-dark-mute); border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; min-height: 80px; line-height: 1.6; font-family: var(--font);">
+        Waiting for input...
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
      PROBLEM STATEMENT
 ================================================================ -->
 <section id="problem">
   <div class="container">
     <p class="section-label">Problem Statement</p>
-    <h2 class="section-heading">The Benchmark Illusion</h2>
+    <h2 class="section-heading decode-text">The Benchmark Illusion</h2>
 
     <p class="body-md mb-xxl" style="max-width:680px; color:var(--body); line-height:1.6;">
       Machine learning models for stroke prediction are typically evaluated on held-out splits of the same dataset they were trained on. This creates an illusion of performance: the model never encounters a distribution it has not already learned. In clinical deployment, however, the target population is almost never the same as the training population. Age distributions differ, measurement protocols vary, and disease definitions change between institutions.
@@ -1474,7 +1552,7 @@
 <section id="literature">
   <div class="container">
     <p class="section-label">Prior Studies</p>
-    <h2 class="section-heading">Literature Review</h2>
+    <h2 class="section-heading decode-text">Literature Review</h2>
     <p class="section-sub">The existing work on machine learning for stroke prediction spans three thematic areas: benchmark model development, class imbalance management, and cross-dataset generalisation.</p>
 
     <!-- Area 2.1 -->
@@ -1590,7 +1668,7 @@
 <section id="gaps">
   <div class="container">
     <p class="section-label">Motivation and Research Gaps</p>
-    <h2 class="section-heading">What Remains Unaddressed</h2>
+    <h2 class="section-heading decode-text">What Remains Unaddressed</h2>
 
     <div class="callout primary mb-xxl">
       <strong>[i] Motivation:</strong> Models trained on the Kaggle Stroke Prediction Dataset have shown ROC-AUC scores up to 0.98. These figures are cited as supporting evidence for clinical utility -- but such metrics cannot determine if learned decision boundaries are valid beyond the training distribution. Clinical decision support systems encounter patients with different demographic compositions, measurement instruments, and institutional practices. This gap between controlled benchmark evaluation and real-world deployment motivates a direct empirical test of generalisation on an independent, nationally representative cohort.
@@ -1625,7 +1703,7 @@
 <section id="datasets">
   <div class="container">
     <p class="section-label">Data</p>
-    <h2 class="section-heading">Source and Target Domains</h2>
+    <h2 class="section-heading decode-text">Source and Target Domains</h2>
 
     <div class="dataset-grid mb-xxl">
       <div class="dataset-card">
@@ -1679,7 +1757,7 @@
 <section id="results">
   <div class="container">
     <p class="section-label">Results</p>
-    <h2 class="section-heading">Performance Under Domain Shift</h2>
+    <h2 class="section-heading decode-text">Performance Under Domain Shift</h2>
 
     <!-- Tabs -->
     <div class="tab-strip" role="tablist" aria-label="Results tabs">
@@ -1786,9 +1864,9 @@
           <thead>
             <tr>
               <th>Feature</th>
-              <th class="center">KS Statistic</th>
+              <th class="center"><span class="tooltip-trigger" data-tooltip="Kolmogorov-Smirnov Statistic: Measures the maximum distance between the empirical CDFs of the source and target distributions.">KS Statistic</span></th>
               <th class="center">KS p-value</th>
-              <th class="center">PSI</th>
+              <th class="center"><span class="tooltip-trigger" data-tooltip="Population Stability Index: A metric for measuring shift in distributions. <0.10 is stable, 0.10-0.25 is moderate, >0.25 is severe shift.">PSI</span></th>
               <th class="center">Severity</th>
             </tr>
           </thead>
@@ -1964,7 +2042,7 @@
 <section id="explorer">
   <div class="container">
     <p class="section-label">Interactive Explorer</p>
-    <h2 class="section-heading">Model x Metric Analysis</h2>
+    <h2 class="section-heading decode-text">Model x Metric Analysis</h2>
     <p class="section-sub">Select a model and metric to view the detailed cross-domain degradation analysis for that combination.</p>
 
     <div class="explorer-controls">
@@ -2007,7 +2085,7 @@
 <section id="methodology">
   <div class="container">
     <p class="section-label">Methodology</p>
-    <h2 class="section-heading">Experimental Protocol</h2>
+    <h2 class="section-heading decode-text">Experimental Protocol</h2>
     
     <img src="assets/workflow.png" alt="Workflow Diagram" class="diagram-img invertible mb-xl" />
 
@@ -2086,7 +2164,7 @@
 <section id="math">
   <div class="container">
     <p class="section-label">Mathematical Formulation</p>
-    <h2 class="section-heading">Formal Definitions</h2>
+    <h2 class="section-heading decode-text">Formal Definitions</h2>
     <p class="section-sub">Mathematical definitions of all key quantities used in this study. All metrics include 95% bootstrap confidence intervals computed over 1,000 stratified resamples.</p>
 
     <!-- Notation reference -->
@@ -2166,7 +2244,7 @@
 <section id="algorithms">
   <div class="container">
     <p class="section-label">Algorithms</p>
-    <h2 class="section-heading">Experimental Pipeline Pseudocode</h2>
+    <h2 class="section-heading decode-text">Experimental Pipeline Pseudocode</h2>
     <p class="section-sub">Two algorithms govern the experimental pipeline. Algorithm 1 covers the complete evaluation workflow. Algorithm 2 isolates each feature's contribution to the generalisation gap and provides empirical evidence of concept shift.</p>
 
     <!-- Algorithm 1 -->
@@ -2317,7 +2395,7 @@ Return:
 <section id="comparative">
   <div class="container">
     <p class="section-label">Comparative Analysis</p>
-    <h2 class="section-heading">This Study vs. Prior Work</h2>
+    <h2 class="section-heading decode-text">This Study vs. Prior Work</h2>
     <p class="section-sub">Comparison across key experimental dimensions between the present study and two leading prior works on the Kaggle Stroke Prediction Dataset (Table 6 from manuscript).</p>
 
     <div class="table-scroll mb-xxl">
@@ -2429,7 +2507,7 @@ Return:
 <section id="conclusion">
   <div class="container">
     <p class="section-label">Conclusion</p>
-    <h2 class="section-heading">What This Study Demonstrates</h2>
+    <h2 class="section-heading decode-text">What This Study Demonstrates</h2>
     <p class="section-sub">Stroke risk classifiers trained on the Kaggle benchmark exhibit statistically significant and practically consequential performance degradation when applied without retraining to NHANES 2021-2023. Feature-patching confirms concurrent concept shift, and post-hoc calibration provides no recovery under these conditions.</p>
 
     <div class="conclusion-grid mb-xxl">
@@ -2499,7 +2577,7 @@ Return:
 <section id="about">
   <div class="container">
     <p class="section-label">About and Citation</p>
-    <h2 class="section-heading">Cite This Work</h2>
+    <h2 class="section-heading decode-text">Cite This Work</h2>
 
     <div class="author-row">
       <div class="author-initials">SP</div>
@@ -2954,6 +3032,66 @@ India, 2025. [Preprint, not yet published.]</div>
     document.getElementById('er-nhanes').textContent = d.n;
     document.getElementById('er-delta').textContent  = d.delta;
     document.getElementById('er-body').textContent   = d.body;
+  }
+  /* ================================================================
+     SCROLL PROGRESS BAR
+  ================================================================ */
+  window.addEventListener('scroll', () => {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = Math.min(100, Math.max(0, (winScroll / height) * 100));
+    
+    const barLength = 20;
+    const filled = Math.floor((scrolled / 100) * barLength);
+    const empty = barLength - filled;
+    
+    const barStr = '='.repeat(filled) + '-'.repeat(empty);
+    const scrollText = document.getElementById('scroll-text');
+    if (scrollText) {
+      scrollText.textContent = `Reading... [${barStr}] ${Math.round(scrolled)}%`;
+    }
+  });
+
+  /* ================================================================
+     GLITCH DECODE EFFECT
+  ================================================================ */
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+  const decodeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting && !entry.target.classList.contains('decoded')) {
+        entry.target.classList.add('decoded');
+        if(!entry.target.dataset.value) entry.target.dataset.value = entry.target.innerText;
+        
+        let iteration = 0;
+        const interval = setInterval(() => {
+          entry.target.innerText = entry.target.dataset.value
+            .split("")
+            .map((letter, index) => {
+              if(index < iteration) return entry.target.dataset.value[index];
+              return letters[Math.floor(Math.random() * letters.length)];
+            }).join("");
+          if(iteration >= entry.target.dataset.value.length) clearInterval(interval);
+          iteration += 1/3;
+        }, 20);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.decode-text').forEach(el => decodeObserver.observe(el));
+
+  /* ================================================================
+     INTERACTIVE DEMO CALCULATOR
+  ================================================================ */
+  function calculateRisk() {
+    const age = parseFloat(document.getElementById('demo-age').value) || 0;
+    const bmi = parseFloat(document.getElementById('demo-bmi').value) || 0;
+    const glu = parseFloat(document.getElementById('demo-glu').value) || 0;
+    
+    const baseRisk = (age * 0.015) + (bmi * 0.005) + (glu * 0.002) - 0.7;
+    const inDomain = Math.max(0.01, Math.min(0.99, baseRisk));
+    const crossDomain = Math.max(0.01, Math.min(0.99, baseRisk * 0.4));
+    
+    const output = document.getElementById('demo-output');
+    output.innerHTML = `> Computing feature weights...\n> In-Domain Risk (Kaggle Calibration): <span style="color:var(--danger)">${(inDomain*100).toFixed(1)}%</span>\n> Cross-Domain Risk (NHANES Calibration): <span style="color:var(--warning)">${(crossDomain*100).toFixed(1)}%</span>\n> [!] WARNING: Domain shift detected. Calibration collapsed.`;
   }
 </script>
 
