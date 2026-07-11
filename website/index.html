@@ -3214,7 +3214,7 @@ India, 2025. [Preprint, not yet published.]</div>
           copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
           copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
           copyBtn.onclick = () => {
-            navigator.clipboard.writeText(JSON.stringify(rows, null, 2));
+            copyTextFallback(JSON.stringify(rows, null, 2));
             copyBtn.innerText = '[COPIED]';
             setTimeout(() => copyBtn.innerText = '[COPY]', 2000);
           };
@@ -3276,12 +3276,36 @@ India, 2025. [Preprint, not yet published.]</div>
     copyBtn.onclick = function() {
       // get text but ignore any button text if accidentally caught
       const textToCopy = cb.innerText.replace(/\[COPY\]|\[COPIED\]/g, '').trim();
-      navigator.clipboard.writeText(textToCopy);
+      copyTextFallback(textToCopy);
       copyBtn.innerText = '[COPIED]';
       setTimeout(() => copyBtn.innerText = '[COPY]', 2000);
     };
     wrapper.appendChild(copyBtn);
   });
+
+  /* ================================================================
+     CLIPBOARD FALLBACK
+  ================================================================ */
+  function copyTextFallback(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).catch(err => console.error(err));
+    } else {
+      let textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Fallback copy failed', err);
+      }
+      textArea.remove();
+    }
+  }
 
   /* ================================================================
      RUN TESTS SIMULATION
