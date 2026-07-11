@@ -1347,10 +1347,8 @@
 </div>
 
 <!-- ================================================================
-     MATRIX BACKGROUND & BOOT SEQUENCE
+     BOOT SEQUENCE
 ================================================================ -->
-<canvas id="matrix-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.03; pointer-events: none;"></canvas>
-
 <div id="boot-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #0f0; z-index: 100000; font-family: monospace; font-size: 14px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-end;">
   <div id="boot-log" style="white-space: pre-wrap;"></div>
 </div>
@@ -3138,45 +3136,6 @@ India, 2025. [Preprint, not yet published.]</div>
     }
   }
   window.addEventListener('DOMContentLoaded', runBoot);
-
-  /* ================================================================
-     MATRIX BACKGROUND
-  ================================================================ */
-  const canvas = document.getElementById('matrix-canvas');
-  const ctx = canvas.getContext('2d');
-  
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  
-  const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-  const fontSize = 14;
-  const columns = canvas.width / fontSize;
-  const drops = Array.from({length: Math.floor(columns)}).fill(1);
-  
-  function drawMatrix() {
-    ctx.fillStyle = "rgba(253, 252, 252, 0.05)";
-    if (document.body.classList.contains('dark-mode')) {
-      ctx.fillStyle = "rgba(18, 18, 18, 0.05)";
-    }
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = document.body.classList.contains('dark-mode') ? "#fff" : "#000";
-    ctx.font = fontSize + "px monospace";
-    
-    for (let i = 0; i < drops.length; i++) {
-      const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = 0;
-      }
-      drops[i]++;
-    }
-  }
-  setInterval(drawMatrix, 50);
-  window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  });
 
   /* ================================================================
      HACKABLE NUMBERS
