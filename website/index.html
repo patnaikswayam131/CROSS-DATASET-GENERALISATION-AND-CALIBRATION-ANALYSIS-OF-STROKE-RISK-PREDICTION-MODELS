@@ -1287,72 +1287,7 @@
       .wf-step { min-width: unset; }
       .wf-arrow { display: none; }
     }
-    /* ================================================================
-       INLINE COPY BUTTON (overrides all browser defaults)
-    ================================================================ */
-    .inline-copy-btn {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      display: inline-block;
-      font-family: var(--font);
-      font-size: 10px;
-      font-weight: 400;
-      background: var(--canvas);
-      color: var(--ink);
-      border: 1px solid var(--hairline-strong);
-      border-radius: 0;
-      padding: 2px 7px;
-      cursor: pointer;
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      z-index: 10;
-      box-shadow: none;
-      outline: none;
-      line-height: 1.5;
-      transition: background 0.15s, color 0.15s;
-    }
-    .inline-copy-btn:hover {
-      background: var(--ink);
-      color: var(--canvas);
-    }
 
-    /* ================================================================
-       HOVER TOOLTIPS
-    ================================================================ */
-    .tooltip-trigger {
-      border-bottom: 1px dashed var(--ink);
-      cursor: help;
-      position: relative;
-    }
-    .tooltip-trigger::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-8px);
-      background: var(--ink);
-      color: var(--canvas);
-      padding: 8px 12px;
-      border-radius: var(--r-sm);
-      font-size: 12px;
-      white-space: pre-wrap;
-      width: max-content;
-      max-width: 300px;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.2s;
-      z-index: 9999;
-      border: 1px solid var(--hairline-strong);
-      pointer-events: none;
-      text-align: left;
-      font-weight: 400;
-    }
-    .tooltip-trigger:hover::after {
-      opacity: 1;
-      visibility: visible;
-    }
 
     /* ================================================================
        PRINT OPTIMIZATION
@@ -1908,9 +1843,9 @@
           <thead>
             <tr>
               <th>Feature</th>
-              <th class="center"><span class="tooltip-trigger" data-tooltip="Kolmogorov-Smirnov Statistic: Measures the maximum distance between the empirical CDFs of the source and target distributions.">KS Statistic</span></th>
+              <th class="center">KS Statistic</th>
               <th class="center">KS p-value</th>
-              <th class="center"><span class="tooltip-trigger" data-tooltip="Population Stability Index: A metric for measuring shift in distributions. <0.10 is stable, 0.10-0.25 is moderate, >0.25 is severe shift.">PSI</span></th>
+              <th class="center">PSI</th>
               <th class="center">Severity</th>
             </tr>
           </thead>
@@ -3225,71 +3160,27 @@ India, 2025. [Preprint, not yet published.]</div>
           });
           const rawDiv = document.createElement('pre');
           rawDiv.className = 'raw-data-view code-block';
-          rawDiv.style.padding = '30px 10px 10px 10px';
+          rawDiv.style.padding = '10px';
           rawDiv.style.overflowX = 'auto';
           rawDiv.style.fontSize = '12px';
           rawDiv.style.color = 'var(--success)';
-          rawDiv.style.margin = '0';
+          rawDiv.style.margin = '0 0 var(--s-md) 0';
           rawDiv.textContent = JSON.stringify(rows, null, 2);
-          
-          const copyBtn = document.createElement('button');
-          copyBtn.innerText = '[COPY]';
-          copyBtn.className = 'inline-copy-btn';
-          copyBtn.onclick = () => {
-            copyTextFallback(JSON.stringify(rows, null, 2));
-            copyBtn.innerText = '[COPIED]';
-            setTimeout(() => copyBtn.innerText = '[COPY]', 2000);
-          };
-
-          const rawWrapper = document.createElement('div');
-          rawWrapper.className = 'raw-data-wrapper';
-          rawWrapper.style.position = 'relative';
-          rawWrapper.style.marginBottom = 'var(--s-md)';
-          rawWrapper.appendChild(copyBtn);
-          rawWrapper.appendChild(rawDiv);
-          
-          table.parentNode.insertBefore(rawWrapper, table.nextSibling);
+          table.parentNode.insertBefore(rawDiv, table.nextSibling);
           table.dataset.raw = 'true';
         }
         table.style.display = 'none';
-        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-wrapper')) {
+        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-view')) {
           table.nextSibling.style.display = 'block';
         }
       } else {
         table.style.display = 'table';
-        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-wrapper')) {
+        if (table.nextSibling && table.nextSibling.classList.contains('raw-data-view')) {
           table.nextSibling.style.display = 'none';
         }
       }
     });
   }
-  /* ================================================================
-     COPY BUTTON FOR EXISTING CODE BLOCKS
-  ================================================================ */
-  document.querySelectorAll('.code-block').forEach(cb => {
-    if (cb.classList.contains('raw-data-view') || cb.id === 'demo') return; // exclude dynamic and demo block
-    
-    // Check if parent is already a wrapper to avoid double-wrapping
-    if (cb.parentNode.classList.contains('code-block-wrapper')) return;
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'code-block-wrapper';
-    wrapper.style.position = 'relative';
-    cb.parentNode.insertBefore(wrapper, cb);
-    wrapper.appendChild(cb);
-    
-    const copyBtn = document.createElement('button');
-    copyBtn.innerText = '[COPY]';
-    copyBtn.className = 'inline-copy-btn';
-    copyBtn.onclick = function() {
-      const textToCopy = cb.innerText.replace(/\[COPY\]|\[COPIED\]/g, '').trim();
-      copyTextFallback(textToCopy);
-      copyBtn.innerText = '[COPIED]';
-      setTimeout(() => copyBtn.innerText = '[COPY]', 2000);
-    };
-    wrapper.appendChild(copyBtn);
-  });
-
   /* ================================================================
      CLIPBOARD FALLBACK
   ================================================================ */
