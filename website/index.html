@@ -1288,10 +1288,41 @@
       .wf-arrow { display: none; }
     }
     /* ================================================================
+       INLINE COPY BUTTON (overrides all browser defaults)
+    ================================================================ */
+    .inline-copy-btn {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      display: inline-block;
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 400;
+      background: var(--canvas);
+      color: var(--ink);
+      border: 1px solid var(--hairline-strong);
+      border-radius: 0;
+      padding: 2px 7px;
+      cursor: pointer;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 10;
+      box-shadow: none;
+      outline: none;
+      line-height: 1.5;
+      transition: background 0.15s, color 0.15s;
+    }
+    .inline-copy-btn:hover {
+      background: var(--ink);
+      color: var(--canvas);
+    }
+
+    /* ================================================================
        HOVER TOOLTIPS
     ================================================================ */
     .tooltip-trigger {
-      border-bottom: 1px dashed var(--on-dark-mute);
+      border-bottom: 1px dashed var(--ink);
       cursor: help;
       position: relative;
     }
@@ -1308,13 +1339,15 @@
       font-size: 12px;
       white-space: pre-wrap;
       width: max-content;
-      max-width: 250px;
+      max-width: 300px;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.2s;
-      z-index: 100;
+      z-index: 9999;
       border: 1px solid var(--hairline-strong);
       pointer-events: none;
+      text-align: left;
+      font-weight: 400;
     }
     .tooltip-trigger:hover::after {
       opacity: 1;
@@ -3201,20 +3234,7 @@ India, 2025. [Preprint, not yet published.]</div>
           
           const copyBtn = document.createElement('button');
           copyBtn.innerText = '[COPY]';
-          copyBtn.style.position = 'absolute';
-          copyBtn.style.top = '8px';
-          copyBtn.style.right = '8px';
-          copyBtn.style.background = 'var(--canvas)';
-          copyBtn.style.color = 'var(--ink)';
-          copyBtn.style.border = '1px solid var(--hairline)';
-          copyBtn.style.borderRadius = '0';
-          copyBtn.style.appearance = 'none';
-          copyBtn.style.padding = '2px 6px';
-          copyBtn.style.fontSize = '10px';
-          copyBtn.style.fontFamily = 'var(--font)';
-          copyBtn.style.cursor = 'pointer';
-          copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
-          copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
+          copyBtn.className = 'inline-copy-btn';
           copyBtn.onclick = () => {
             copyTextFallback(JSON.stringify(rows, null, 2));
             copyBtn.innerText = '[COPIED]';
@@ -3260,25 +3280,8 @@ India, 2025. [Preprint, not yet published.]</div>
     
     const copyBtn = document.createElement('button');
     copyBtn.innerText = '[COPY]';
-    copyBtn.style.position = 'absolute';
-    copyBtn.style.top = '8px';
-    copyBtn.style.right = '8px';
-    copyBtn.style.background = 'var(--canvas)';
-    copyBtn.style.color = 'var(--ink)';
-    copyBtn.style.border = '1px solid var(--hairline)';
-    copyBtn.style.borderRadius = '0';
-    copyBtn.style.appearance = 'none';
-    copyBtn.style.padding = '2px 6px';
-    copyBtn.style.fontSize = '10px';
-    copyBtn.style.fontFamily = 'var(--font)';
-    copyBtn.style.cursor = 'pointer';
-    copyBtn.style.zIndex = '10';
-    
-    copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
-    copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
-    
+    copyBtn.className = 'inline-copy-btn';
     copyBtn.onclick = function() {
-      // get text but ignore any button text if accidentally caught
       const textToCopy = cb.innerText.replace(/\[COPY\]|\[COPIED\]/g, '').trim();
       copyTextFallback(textToCopy);
       copyBtn.innerText = '[COPIED]';
