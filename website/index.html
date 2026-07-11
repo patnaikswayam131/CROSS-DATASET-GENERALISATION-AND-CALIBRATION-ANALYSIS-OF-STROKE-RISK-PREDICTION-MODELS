@@ -3204,15 +3204,17 @@ India, 2025. [Preprint, not yet published.]</div>
           copyBtn.style.position = 'absolute';
           copyBtn.style.top = '8px';
           copyBtn.style.right = '8px';
-          copyBtn.style.background = 'var(--ink)';
-          copyBtn.style.color = 'var(--canvas)';
+          copyBtn.style.background = 'var(--canvas)';
+          copyBtn.style.color = 'var(--ink)';
           copyBtn.style.border = '1px solid var(--hairline)';
+          copyBtn.style.borderRadius = '0';
+          copyBtn.style.appearance = 'none';
           copyBtn.style.padding = '2px 6px';
           copyBtn.style.fontSize = '10px';
           copyBtn.style.fontFamily = 'var(--font)';
           copyBtn.style.cursor = 'pointer';
-          copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
-          copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
+          copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
+          copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
           copyBtn.onclick = () => {
             copyTextFallback(JSON.stringify(rows, null, 2));
             copyBtn.innerText = '[COPIED]';
@@ -3261,17 +3263,19 @@ India, 2025. [Preprint, not yet published.]</div>
     copyBtn.style.position = 'absolute';
     copyBtn.style.top = '8px';
     copyBtn.style.right = '8px';
-    copyBtn.style.background = 'var(--ink)';
-    copyBtn.style.color = 'var(--canvas)';
+    copyBtn.style.background = 'var(--canvas)';
+    copyBtn.style.color = 'var(--ink)';
     copyBtn.style.border = '1px solid var(--hairline)';
+    copyBtn.style.borderRadius = '0';
+    copyBtn.style.appearance = 'none';
     copyBtn.style.padding = '2px 6px';
     copyBtn.style.fontSize = '10px';
     copyBtn.style.fontFamily = 'var(--font)';
     copyBtn.style.cursor = 'pointer';
     copyBtn.style.zIndex = '10';
     
-    copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
-    copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
+    copyBtn.onmouseenter = () => { copyBtn.style.background = 'var(--ink)'; copyBtn.style.color = 'var(--canvas)'; };
+    copyBtn.onmouseleave = () => { copyBtn.style.background = 'var(--canvas)'; copyBtn.style.color = 'var(--ink)'; };
     
     copyBtn.onclick = function() {
       // get text but ignore any button text if accidentally caught
