@@ -229,18 +229,20 @@ export default function HeroResearchSummary() {
 
                   {/* Kaggle in-domain curve (Forest Green #1B5E54) */}
                   <path
-                    d="M 40 210 Q 60 110, 110 75 T 200 40 T 320 20"
+                    d={activeRocPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(40 + p.fpr * 280).toFixed(1)} ${(20 + (1 - p.kaggleTpr) * 190).toFixed(1)}`).join(' ')}
                     fill="none"
                     stroke="#1B5E54"
-                    strokeWidth="2.2"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
                   />
 
                   {/* NHANES target curve (Warm Terracotta #A33B20) */}
                   <path
-                    d="M 40 210 Q 80 150, 150 115 T 250 55 T 320 20"
+                    d={activeRocPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(40 + p.fpr * 280).toFixed(1)} ${(20 + (1 - p.nhanesTpr) * 190).toFixed(1)}`).join(' ')}
                     fill="none"
                     stroke="#A33B20"
-                    strokeWidth="2.2"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
                   />
 
                   {/* Dynamic Hover Crosshair */}
@@ -296,22 +298,27 @@ export default function HeroResearchSummary() {
                   <line x1="40" y1="20" x2="40" y2="210" stroke="#111816" strokeWidth="1" />
 
                   {/* Prevalence baseline */}
-                  <line x1="40" y1="202" x2="320" y2="202" stroke="#9AA39E" strokeWidth="1" strokeDasharray="2 2" />
+                  <line x1="40" y1={(20 + (1 - 0.041) * 190).toFixed(1)} x2="320" y2={(20 + (1 - 0.041) * 190).toFixed(1)} stroke="#A33B20" strokeWidth="1.2" strokeDasharray="3 3" />
+                  <text x="315" y={(20 + (1 - 0.041) * 190 - 5).toFixed(1)} textAnchor="end" className="text-[9px] font-mono fill-[#A33B20] font-semibold">
+                    Prevalence 4.10%
+                  </text>
 
                   {/* Kaggle PR Curve */}
                   <path
-                    d="M 40 135 C 70 140, 110 160, 160 175 C 220 188, 280 198, 320 202"
+                    d={activePrPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(40 + p.recall * 280).toFixed(1)} ${(20 + (1 - p.kagglePrecision) * 190).toFixed(1)}`).join(' ')}
                     fill="none"
                     stroke="#1B5E54"
-                    strokeWidth="2.2"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
                   />
 
                   {/* NHANES Target PR Curve (Collapse) */}
                   <path
-                    d="M 40 185 C 80 192, 160 198, 240 201 L 320 202"
+                    d={activePrPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(40 + p.recall * 280).toFixed(1)} ${(20 + (1 - p.nhanesPrecision) * 190).toFixed(1)}`).join(' ')}
                     fill="none"
                     stroke="#A33B20"
-                    strokeWidth="2.2"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
                   />
 
                   {/* Axis labels */}

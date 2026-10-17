@@ -99,11 +99,26 @@ export default function InteractiveSimulator() {
               {/* Sliders Grid */}
               <div className="space-y-6">
                 
-                {/* Age Slider */}
+                {/* Age Slider with Direct Typing */}
                 <div>
                   <div className="flex items-center justify-between font-mono text-xs mb-2">
-                    <span className="font-medium text-[#111816]">Age</span>
-                    <span className="font-semibold text-[#1B5E54]">{age} years</span>
+                    <label htmlFor="input-age" className="font-medium text-[#111816]">Age</label>
+                    <div className="flex items-center gap-1.5 bg-white border border-[#E2E0D8] rounded-xs px-2 py-0.5 focus-within:border-[#111816] transition-colors shadow-xs">
+                      <input
+                        id="input-age"
+                        type="number"
+                        min="18"
+                        max="85"
+                        step="1"
+                        value={age}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          if (!isNaN(val)) setAge(Math.min(85, Math.max(18, val)));
+                        }}
+                        className="w-10 text-right font-mono text-xs font-semibold text-[#1B5E54] bg-transparent outline-none p-0"
+                      />
+                      <span className="text-[11px] text-[#55635E]">years</span>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -121,13 +136,28 @@ export default function InteractiveSimulator() {
                   </div>
                 </div>
 
-                {/* Glucose Slider */}
+                {/* Glucose Slider with Direct Typing */}
                 <div>
                   <div className="flex items-center justify-between font-mono text-xs mb-2">
-                    <span className="font-medium text-[#111816]">Glucose Level</span>
-                    <span className={`font-semibold ${glucose >= 180 ? 'text-[#A33B20]' : 'text-[#1B5E54]'}`}>
-                      {glucose} mg/dL
-                    </span>
+                    <label htmlFor="input-glucose" className="font-medium text-[#111816]">Glucose Level</label>
+                    <div className="flex items-center gap-1.5 bg-white border border-[#E2E0D8] rounded-xs px-2 py-0.5 focus-within:border-[#111816] transition-colors shadow-xs">
+                      <input
+                        id="input-glucose"
+                        type="number"
+                        min="60"
+                        max="280"
+                        step="1"
+                        value={glucose}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          if (!isNaN(val)) setGlucose(Math.min(280, Math.max(60, val)));
+                        }}
+                        className={`w-12 text-right font-mono text-xs font-semibold bg-transparent outline-none p-0 ${
+                          glucose >= 180 ? 'text-[#A33B20]' : 'text-[#1B5E54]'
+                        }`}
+                      />
+                      <span className="text-[11px] text-[#55635E]">mg/dL</span>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -145,11 +175,26 @@ export default function InteractiveSimulator() {
                   </div>
                 </div>
 
-                {/* BMI Slider */}
+                {/* BMI Slider with Direct Typing */}
                 <div>
                   <div className="flex items-center justify-between font-mono text-xs mb-2">
-                    <span className="font-medium text-[#111816]">Body Mass Index (BMI)</span>
-                    <span className="font-semibold text-[#1B5E54]">{bmi.toFixed(1)} kg/m²</span>
+                    <label htmlFor="input-bmi" className="font-medium text-[#111816]">Body Mass Index (BMI)</label>
+                    <div className="flex items-center gap-1.5 bg-white border border-[#E2E0D8] rounded-xs px-2 py-0.5 focus-within:border-[#111816] transition-colors shadow-xs">
+                      <input
+                        id="input-bmi"
+                        type="number"
+                        min="15"
+                        max="50"
+                        step="0.1"
+                        value={bmi}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          if (!isNaN(val)) setBmi(Math.min(50, Math.max(15, val)));
+                        }}
+                        className="w-12 text-right font-mono text-xs font-semibold text-[#1B5E54] bg-transparent outline-none p-0"
+                      />
+                      <span className="text-[11px] text-[#55635E]">kg/m²</span>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -280,8 +325,23 @@ export default function InteractiveSimulator() {
             <div className="lg:col-span-6 space-y-6">
               <div>
                 <div className="flex items-center justify-between font-mono text-xs mb-2">
-                  <span className="font-medium text-[#111816]">Decision Threshold (τ)</span>
-                  <span className="font-semibold text-[#1B5E54] font-mono">{threshold.toFixed(2)}</span>
+                  <label htmlFor="input-thresh" className="font-medium text-[#111816]">Decision Threshold (τ)</label>
+                  <div className="flex items-center gap-1.5 bg-white border border-[#E2E0D8] rounded-xs px-2 py-0.5 focus-within:border-[#111816] transition-colors shadow-xs">
+                    <input
+                      id="input-thresh"
+                      type="number"
+                      min="0.02"
+                      max="0.40"
+                      step="0.01"
+                      value={threshold}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (!isNaN(val)) setThreshold(Math.min(0.40, Math.max(0.02, val)));
+                      }}
+                      className="w-12 text-right font-mono text-xs font-semibold text-[#1B5E54] bg-transparent outline-none p-0"
+                    />
+                    <span className="text-[11px] text-[#55635E]">τ</span>
+                  </div>
                 </div>
                 <input
                   type="range"
