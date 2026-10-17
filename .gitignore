@@ -15,3 +15,8 @@ manuscript_text.txt
 # Subprojects
 website/node_modules
 website/dist
+
+# Agent skills and customizations
+.agents/
+.agents/skills/
+*/.agents/

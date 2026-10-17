@@ -1,7 +1,6 @@
 /**
- * MathFormulation — Section 4.4 of the manuscript.
- * Renders all 7 mathematical definitions using styled SVG-text / pre-formatted blocks.
- * Uses KaTeX CDN for proper formula rendering.
+ * MathFormulation  -  Section 4.4 of the manuscript.
+ * Renders all 7 mathematical definitions using KaTeX with Swiss Editorial styling.
  */
 import { useEffect } from 'react';
 import { GlassCard } from '../ui/GlassCard';
@@ -11,7 +10,7 @@ const EQUATIONS = [
     id: 'eq1',
     number: 'Eq. 1',
     label: 'Covariate Shift',
-    accent: 'primary',
+    accent: 'neutral',
     description:
       'Covariate shift occurs when the marginal feature distribution differs between source and target domains while the conditional label distribution remains stable.',
     latex: 'P_S(X) \\neq P_T(X) \\quad \\text{but} \\quad P_S(Y|X) = P_T(Y|X)',
@@ -24,7 +23,7 @@ const EQUATIONS = [
     label: 'Concept Shift',
     accent: 'danger',
     description:
-      'Concept shift occurs when the relationship between features and labels differs across domains — the decision boundary itself has changed.',
+      'Concept shift occurs when the relationship between features and labels differs across domains  -  the decision boundary itself has changed.',
     latex: 'P_S(Y|X) \\neq P_T(Y|X)',
     readable: 'Pₛ(Y|X) ≠ P_T(Y|X)',
     note: 'All-negative feature-patching deltas confirm concurrent concept shift in this study',
@@ -43,8 +42,8 @@ const EQUATIONS = [
   {
     id: 'eq4',
     number: 'Eq. 4',
-    label: 'Generalisation Gap',
-    accent: 'primary',
+    label: 'Generalisation Gap (Δ)',
+    accent: 'neutral',
     description:
       'Measures performance loss under domain shift, where the model is trained on source domain only.',
     latex: '\\Delta = \\mathcal{M}(f_{\\mathcal{S}}, \\mathcal{S}_{\\text{test}}) - \\mathcal{M}(f_{\\mathcal{S}}, \\mathcal{T})',
@@ -55,7 +54,7 @@ const EQUATIONS = [
     id: 'eq5',
     number: 'Eq. 5',
     label: 'Average Precision (PR-AUC)',
-    accent: 'success',
+    accent: 'neutral',
     description:
       'Preferred over ROC-AUC as it is sensitive to minority-class detection failure under class imbalance. The random baseline equals the class prevalence (~0.041 for NHANES).',
     latex: '\\text{AP} = \\sum_{n}(R_n - R_{n-1})P_n',
@@ -85,23 +84,6 @@ const EQUATIONS = [
     note: 'θ̂_b = metric on b-th bootstrap resample · B = 1,000 resamples',
   },
 ];
-
-// Colour helpers
-const ACCENT_LABEL_COLOR = {
-  primary: '#4f8ef7',
-  danger: '#e05c5c',
-  warning: '#e8a838',
-  success: '#4caf82',
-  neutral: '#8b90a4',
-};
-
-const ACCENT_BG = {
-  primary: 'rgba(79,142,247,0.10)',
-  danger: 'rgba(224,92,92,0.10)',
-  warning: 'rgba(232,168,56,0.10)',
-  success: 'rgba(76,175,130,0.10)',
-  neutral: 'rgba(139,144,164,0.08)',
-};
 
 export function MathFormulation() {
   // Load KaTeX from CDN
@@ -135,7 +117,6 @@ export function MathFormulation() {
     });
   };
 
-  // Re-run render when katex loads (if already loaded)
   useEffect(() => {
     const timer = setTimeout(() => {
       if (window.katex) renderAll();
@@ -144,98 +125,102 @@ export function MathFormulation() {
   }, []);
 
   return (
-    <section id="math" className="max-w-7xl py-20 px-6 mx-auto">
-      {/* Section label */}
-      <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#4f8ef7] mb-3">
-        Mathematical Formulation
-      </p>
-      <h2 className="text-3xl md:text-4xl font-bold text-[#e8eaf0] mb-4">
-        Formal Definitions
-      </h2>
-      <p className="text-sm text-[#8b90a4] mb-12 max-w-3xl leading-relaxed">
-        Mathematical definitions of all key quantities used in this study. All metrics include
-        95% bootstrap confidence intervals computed over 1,000 stratified resamples.
-      </p>
-
-      {/* Notation table */}
-      <div className="mb-12 rounded-xl overflow-hidden border border-[#2e3248]">
-        <div className="bg-[#1a1d27] px-5 py-3 border-b border-[#2e3248]">
-          <h3 className="text-sm font-semibold text-[#e8eaf0]">Notation Reference (Table 2)</h3>
+    <section id="formulation" className="py-24 border-b border-white/[0.08] bg-[#09090b]">
+      <div className="max-w-7xl px-6 mx-auto">
+        {/* Section header */}
+        <div className="mb-12">
+          <p className="text-xs font-mono tracking-widest uppercase text-zinc-400 mb-2">
+            07 / THEORETICAL FOUNDATION & EQUATIONS
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-100">
+            Mathematical Formulation
+          </h2>
+          <p className="text-sm text-zinc-400 max-w-3xl mt-3 leading-relaxed">
+            Formal definitions of all statistical quantities used in the manuscript. Every reported 
+            metric incorporates 95% bootstrap confidence intervals computed over B = 1,000 stratified resamples.
+          </p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#2e3248]">
-                <th className="text-left text-[#8b90a4] font-medium py-3 px-5 w-32">Symbol</th>
-                <th className="text-left text-[#8b90a4] font-medium py-3 px-5">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ['S', 'Source domain (Kaggle Stroke Prediction Dataset)'],
-                ['T', 'Target domain (NHANES 2021–2023)'],
-                ['f_S', 'Classifier trained on source domain S only'],
-                ['P(X)', 'Marginal feature distribution'],
-                ['P(Y|X)', 'Conditional label distribution (stroke | features)'],
-                ['M(f, D)', 'Performance metric (ROC-AUC, PR-AUC, etc.) of model f on dataset D'],
-                ['Eᵢ', 'Expected (Kaggle) proportion in PSI bin i'],
-                ['Aᵢ', 'Actual (NHANES) proportion in PSI bin i'],
-                ['Pₙ, Rₙ', 'Precision and recall at threshold n'],
-                ['Sₖ', 'Set of predictions falling in calibration bin k'],
-                ['B', 'Number of bootstrap resamples (B = 1,000)'],
-                ['θ̂_b', 'Metric value on b-th bootstrap resample'],
-              ].map(([sym, desc]) => (
-                <tr key={sym} className="border-t border-[#2e3248] hover:bg-white/[0.02] transition-colors">
-                  <td className="py-2.5 px-5 font-mono text-xs text-[#4f8ef7] whitespace-nowrap">{sym}</td>
-                  <td className="py-2.5 px-5 text-[#8b90a4]">{desc}</td>
+
+        {/* Notation table */}
+        <div className="mb-12 rounded-md overflow-hidden border border-white/[0.08] bg-[#111114]">
+          <div className="bg-[#0c0c0e] px-5 py-3 border-b border-white/[0.08] flex items-center justify-between">
+            <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-200">
+              TABLE 4: MATHEMATICAL NOTATION REFERENCE
+            </h3>
+            <span className="text-[10px] font-mono text-zinc-400">SECTION 4.4</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/[0.08] bg-[#0e0e11] text-zinc-400 font-mono text-[11px] uppercase tracking-wider">
+                  <th className="py-2.5 px-5 w-40">Symbol</th>
+                  <th className="py-2.5 px-5">Operational Definition</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-white/[0.04] text-zinc-300">
+                {[
+                  ['S', 'Source domain (Kaggle Stroke Prediction Dataset, N=5,109)'],
+                  ['T', 'Target domain (NHANES 2021–2023 Held-Out Survey, N=3,167)'],
+                  ['f_S', 'Classifier trained strictly on source domain S split'],
+                  ['P(X)', 'Marginal biomarker distribution across harmonised 4D subspace'],
+                  ['P(Y|X)', 'Conditional label distribution (true stroke risk given covariates)'],
+                  ['M(f, D)', 'Performance metric evaluation of model f on dataset D'],
+                  ['Eᵢ', 'Expected (Kaggle) proportion in PSI decile bin i'],
+                  ['Aᵢ', 'Actual (NHANES) proportion in PSI decile bin i'],
+                  ['Pₙ, Rₙ', 'Empirical precision and recall at operating cutoff n'],
+                  ['Sₖ', 'Set of sample predictions partitioned in calibration bin k'],
+                  ['B', 'Stratified bootstrap resample count (B = 1,000, seed = 42)'],
+                  ['θ̂_b', 'Empirical metric estimate evaluated on b-th resample'],
+                ].map(([sym, desc]) => (
+                  <tr key={sym} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-2.5 px-5 font-mono text-xs text-zinc-200 font-semibold whitespace-nowrap">{sym}</td>
+                    <td className="py-2.5 px-5 text-zinc-400">{desc}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      {/* Equation cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {EQUATIONS.map((eq) => (
-          <GlassCard key={eq.id} accent={eq.accent} maxTilt={5}>
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                className="text-xs font-mono font-semibold px-2.5 py-1 rounded"
-                style={{ background: ACCENT_BG[eq.accent], color: ACCENT_LABEL_COLOR[eq.accent] }}
-              >
-                {eq.number}
-              </span>
-              <h3 className="text-sm font-semibold text-[#e8eaf0]">{eq.label}</h3>
-            </div>
-
-            {/* Description */}
-            <p className="text-xs text-[#8b90a4] leading-relaxed mb-4">{eq.description}</p>
-
-            {/* Formula display — KaTeX renders into this div, fallback shows readable form */}
-            <div
-              className="rounded-lg py-4 px-5 mb-3 text-center overflow-x-auto"
-              style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.07)' }}
-            >
-              <div
-                data-latex={eq.latex}
-                className="text-[#e8eaf0]"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: '1rem', letterSpacing: '0.02em' }}
-              >
-                {/* Readable fallback until KaTeX loads */}
-                <span className="text-[#e8eaf0] text-sm" style={{ fontFamily: 'var(--font-mono)' }}>
-                  {eq.readable}
-                </span>
+        {/* Equation cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {EQUATIONS.map((eq) => (
+            <GlassCard key={eq.id} accent={eq.accent}>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/[0.06]">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[2px] bg-white/[0.06] text-zinc-300 border border-white/[0.08]">
+                    {eq.number}
+                  </span>
+                  <h3 className="text-sm font-semibold text-zinc-100">{eq.label}</h3>
+                </div>
               </div>
-            </div>
 
-            {/* Note */}
-            <p className="text-xs text-[#8b90a4]">
-              <span style={{ color: ACCENT_LABEL_COLOR[eq.accent] }}>ℹ</span> {eq.note}
-            </p>
-          </GlassCard>
-        ))}
+              {/* Description */}
+              <p className="text-xs text-zinc-400 leading-relaxed mb-4">{eq.description}</p>
+
+              {/* Formula display */}
+              <div
+                className="rounded-[3px] py-4 px-5 mb-3 text-center overflow-x-auto bg-[#09090b] border border-white/[0.08]"
+              >
+                <div
+                  data-latex={eq.latex}
+                  className="text-zinc-100"
+                  style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: '0.95rem' }}
+                >
+                  <span className="text-zinc-300 text-xs font-mono">
+                    {eq.readable}
+                  </span>
+                </div>
+              </div>
+
+              {/* Note */}
+              <p className="text-[11px] font-mono text-zinc-400">
+                [NOTE] {eq.note}
+              </p>
+            </GlassCard>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -46,8 +46,8 @@ export const heroContent = {
 
 /**
  * @typedef {Object} StatPill
- * @property {string} text  — Display text
- * @property {string} color — Colour key (danger | primary | neutral)
+ * @property {string} text   -  Display text
+ * @property {string} color  -  Colour key (danger | primary | neutral)
  */
 
 /** @type {StatPill[]} */
@@ -91,8 +91,8 @@ export const heroMiniBar = {
 
 /**
  * @typedef {Object} NavLink
- * @property {string} label  — Display text
- * @property {string} href   — Anchor or path
+ * @property {string} label   -  Display text
+ * @property {string} href    -  Anchor or path
  */
 
 /** @type {NavLink[]} */

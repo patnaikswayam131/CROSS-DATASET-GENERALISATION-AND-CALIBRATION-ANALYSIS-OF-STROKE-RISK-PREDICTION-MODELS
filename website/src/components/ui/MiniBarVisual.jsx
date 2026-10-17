@@ -1,6 +1,6 @@
 /**
- * MiniBarVisual — two-bar comparison for in-domain vs cross-domain.
- * Used in the Hero section to visually show PR-AUC collapse.
+ * MiniBarVisual  -  Swiss Editorial two-bar comparison for in-domain vs cross-domain.
+ * Crisp rectangular bars, zero rounded-full bubbles.
  * @param {{ inDomain: number, crossDomain: number, label: string, maxValue: number }} props
  */
 export function MiniBarVisual({ inDomain, crossDomain, label, maxValue = 0.3 }) {
@@ -8,18 +8,18 @@ export function MiniBarVisual({ inDomain, crossDomain, label, maxValue = 0.3 }) 
   const crossDomainWidth = (crossDomain / maxValue) * 100;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 font-sans">
       {/* In-domain bar */}
       <div>
         <div className="flex justify-between items-center mb-1.5">
-          <span className="text-xs text-[#8b90a4] tracking-wide uppercase">In-Domain (Kaggle)</span>
-          <span className="text-sm font-semibold text-[#4f8ef7]" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="text-[11px] font-mono text-zinc-400 tracking-wider uppercase">In-Domain (Kaggle)</span>
+          <span className="text-sm font-semibold font-mono text-zinc-100">
             {inDomain.toFixed(3)}
           </span>
         </div>
-        <div className="w-full h-3 bg-[#1a1d27] rounded-full overflow-hidden border border-[#2e3248]">
+        <div className="w-full h-2.5 bg-[#09090b] rounded-[2px] overflow-hidden border border-white/[0.08]">
           <div
-            className="h-full rounded-full bg-[#4f8ef7] transition-all duration-1000 ease-out"
+            className="h-full bg-zinc-400 transition-all duration-700 ease-out"
             style={{ width: `${inDomainWidth}%` }}
           />
         </div>
@@ -28,21 +28,21 @@ export function MiniBarVisual({ inDomain, crossDomain, label, maxValue = 0.3 }) 
       {/* Cross-domain bar */}
       <div>
         <div className="flex justify-between items-center mb-1.5">
-          <span className="text-xs text-[#8b90a4] tracking-wide uppercase">Cross-Domain (NHANES)</span>
-          <span className="text-sm font-semibold text-[#e05c5c]" style={{ fontFamily: 'var(--font-mono)' }}>
+          <span className="text-[11px] font-mono text-rose-400 tracking-wider uppercase">Cross-Domain (NHANES)</span>
+          <span className="text-sm font-semibold font-mono text-rose-400">
             {crossDomain.toFixed(3)}
           </span>
         </div>
-        <div className="w-full h-3 bg-[#1a1d27] rounded-full overflow-hidden border border-[#2e3248]">
+        <div className="w-full h-2.5 bg-[#09090b] rounded-[2px] overflow-hidden border border-white/[0.08]">
           <div
-            className="h-full rounded-full bg-[#e05c5c] transition-all duration-1000 ease-out"
+            className="h-full bg-rose-500 transition-all duration-700 ease-out"
             style={{ width: `${crossDomainWidth}%` }}
           />
         </div>
       </div>
 
       {/* Label */}
-      <p className="text-xs text-[#8b90a4] text-center mt-2">{label}</p>
+      {label && <p className="text-[11px] font-mono text-zinc-400 text-center mt-2">{label}</p>}
     </div>
   );
 }

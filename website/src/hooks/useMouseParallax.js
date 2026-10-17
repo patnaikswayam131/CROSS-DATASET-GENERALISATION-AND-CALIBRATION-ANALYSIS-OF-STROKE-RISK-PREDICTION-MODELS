@@ -1,7 +1,7 @@
 import { useRef, useCallback } from 'react';
 
 /**
- * useMouseParallax — returns an event handler and ref that adds a subtle 3D tilt
+ * useMouseParallax  -  returns an event handler and ref that adds a subtle 3D tilt
  * and translation effect to a card element based on mouse position.
  *
  * @param {Object} options

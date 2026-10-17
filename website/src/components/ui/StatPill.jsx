@@ -1,24 +1,43 @@
 /**
- * StatPill — coloured stat indicators for the hero section.
- * @param {{ text: string, color: 'danger'|'primary'|'neutral' }} props
+ * StatPill  -  crisp technical parameter tag with solid indicator dot.
+ * @param {{ text: string, color: 'danger'|'primary'|'neutral'|'success'|'warning' }} props
  */
 export function StatPill({ text, color = 'neutral' }) {
-  const colors = {
-    danger: 'bg-[#e05c5c]/10 text-[#e05c5c] border-[#e05c5c]/25',
-    primary: 'bg-[#4f8ef7]/10 text-[#4f8ef7] border-[#4f8ef7]/25',
-    neutral: 'bg-[#8b90a4]/10 text-[#8b90a4] border-[#8b90a4]/25',
-    success: 'bg-[#4caf82]/10 text-[#4caf82] border-[#4caf82]/25',
-    warning: 'bg-[#e8a838]/10 text-[#e8a838] border-[#e8a838]/25',
+  const styles = {
+    danger: {
+      bg: 'bg-rose-500/10 text-rose-300 border-rose-500/30',
+      dot: 'bg-rose-500',
+    },
+    primary: {
+      bg: 'bg-white/[0.06] text-zinc-200 border-white/20',
+      dot: 'bg-zinc-300',
+    },
+    neutral: {
+      bg: 'bg-white/[0.03] text-zinc-400 border-white/[0.08]',
+      dot: 'bg-zinc-500',
+    },
+    success: {
+      bg: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+      dot: 'bg-emerald-500',
+    },
+    warning: {
+      bg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+      dot: 'bg-amber-500',
+    },
   };
+
+  const current = styles[color] || styles.neutral;
 
   return (
     <span
-      className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium 
-        border tracking-wide ${colors[color] || colors.neutral}`}
+      className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-xs font-mono 
+        border select-none ${current.bg}`}
     >
-      {text}
+      <span className={`h-1.5 w-1.5 rounded-full ${current.dot}`} />
+      <span>{text}</span>
     </span>
   );
 }
 
 export default StatPill;
+

@@ -1,156 +1,125 @@
-import './index.css';
-import { navLinks } from './data/siteConfig';
-
-// ── Original sections ────────────────────────────────────────
-import Hero from './components/sections/Hero';
-import Problem from './components/sections/Problem';
-import Datasets from './components/sections/Datasets';
-import Results from './components/sections/Results';
-import InteractiveExplorer from './components/sections/InteractiveExplorer';
-import Takeaways from './components/sections/Takeaways';
-import Methodology from './components/sections/Methodology';
-import AboutCitation from './components/sections/AboutCitation';
-import Footer from './components/sections/Footer';
-
-// ── New sections ─────────────────────────────────────────────
-import WorkflowDiagram from './components/sections/WorkflowDiagram';
-import LiteratureReview from './components/sections/LiteratureReview';
-import ResearchGaps from './components/sections/ResearchGaps';
-import MathFormulation from './components/sections/MathFormulation';
-import ConclusionFuture from './components/sections/ConclusionFuture';
-import Algorithms from './components/sections/Algorithms';
-import ComparativeAnalysis from './components/sections/ComparativeAnalysis';
-
-const NAV_LINKS = [
-  { label: 'Problem', href: '#problem' },
-  { label: 'Literature', href: '#literature' },
-  { label: 'Results', href: '#results' },
-  { label: 'Explorer', href: '#explorer' },
-  { label: 'Methodology', href: '#methodology' },
-  { label: 'Math', href: '#math' },
-  { label: 'Conclusion', href: '#conclusion' },
-  { label: 'About', href: '#about' },
-];
-
-/** Alternating background section wrapper */
-function SectionWrapper({ id, alt, children }) {
-  return (
-    <div
-      id={id}
-      className="border-t border-[#2e3248]"
-      style={{ backgroundColor: alt ? '#1a1d27' : '#0f1117' }}
-    >
-      {children}
-    </div>
-  );
-}
+import { useState, useEffect } from 'react';
+import Lenis from 'lenis';
+import SiteHeader from './components/editorial/SiteHeader';
+import HeroResearchSummary from './components/editorial/HeroResearchSummary';
+import EvidenceStrip from './components/editorial/EvidenceStrip';
+import QuestionSection from './components/editorial/QuestionSection';
+import StudyDesignFlow from './components/editorial/StudyDesignFlow';
+import DatasetComparison from './components/editorial/DatasetComparison';
+import ResultsFigure from './components/editorial/ResultsFigure';
+import ShiftAnalysis from './components/editorial/ShiftAnalysis';
+import InteractiveSimulator from './components/editorial/InteractiveSimulator';
+import CalibrationSection from './components/editorial/CalibrationSection';
+import InterpretationSection from './components/editorial/InterpretationSection';
+import LimitationsSection from './components/editorial/LimitationsSection';
+import ReproducibilityLinks from './components/editorial/ReproducibilityLinks';
+import SiteFooter from './components/editorial/SiteFooter';
+import { ArrowUp } from 'lucide-react';
 
 function App() {
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    // Check reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    // Initialize Apple-style momentum inertial scroll
+    const lenis = new Lenis({
+      duration: 1.15,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.5,
+    });
+
+    window.__lenis = lenis;
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    const rafId = requestAnimationFrame(raf);
+
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 500);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', handleScroll);
+      lenis.destroy();
+      window.__lenis = null;
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    if (window.__lenis) {
+      window.__lenis.scrollTo(0, { duration: 1.1 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div style={{ backgroundColor: '#0f1117', minHeight: '100vh' }}>
-      {/* ─── Navigation ────────────────────────────────────────── */}
-      <nav
-        className="sticky top-0 z-50 border-b border-[#2e3248]"
-        style={{ backgroundColor: 'rgba(15,17,23,0.92)', backdropFilter: 'blur(12px)' }}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a
-            href="#hero"
-            className="text-xs font-semibold tracking-widest uppercase text-[#4f8ef7] hidden sm:block"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            Stroke Risk · Cross-Domain
-          </a>
-          <div className="flex items-center gap-4 md:gap-6 overflow-x-auto">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-xs md:text-sm text-[#8b90a4] hover:text-[#e8eaf0] transition-colors duration-200 whitespace-nowrap"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[#F5F3EB] text-[#172B29] font-sans antialiased selection:bg-[#E6ECE4] selection:text-[#172B29] relative">
+      {/* 1. Masthead Navigation */}
+      <SiteHeader />
 
-      <main>
-        {/* 1. Hero */}
-        <Hero />
+      <main id="main-content">
+        {/* 2. Hero: Establish Question, Models, and Visual Evidence */}
+        <HeroResearchSummary />
 
-        {/* 2. Workflow Diagram — directly after hero */}
-        <SectionWrapper id="workflow-wrap" alt>
-          <WorkflowDiagram />
-        </SectionWrapper>
+        {/* 3. Evidence Strip: 3 Primary Empirical Metrics */}
+        <EvidenceStrip />
 
-        {/* 3. Problem */}
-        <SectionWrapper id="problem">
-          <Problem />
-        </SectionWrapper>
+        {/* 4. Section 01: The Question */}
+        <QuestionSection />
 
-        {/* 4. Literature Review */}
-        <SectionWrapper id="literature" alt>
-          <LiteratureReview />
-        </SectionWrapper>
+        {/* 5. Section 02: Study Design Flow */}
+        <StudyDesignFlow />
 
-        {/* 5. Research Gaps */}
-        <SectionWrapper id="gaps">
-          <ResearchGaps />
-        </SectionWrapper>
+        {/* 6. Section 03: Datasets and Harmonisation */}
+        <DatasetComparison />
 
-        {/* 6. Datasets */}
-        <SectionWrapper id="datasets" alt>
-          <Datasets />
-        </SectionWrapper>
+        {/* 7. Section 04: Empirical Evidence and Curves */}
+        <ResultsFigure />
 
-        {/* 7. Results */}
-        <SectionWrapper id="results">
-          <Results />
-        </SectionWrapper>
+        {/* 8. Section 05: Dataset Shift & Domain Classifier */}
+        <ShiftAnalysis />
 
-        {/* 8. Interactive Explorer */}
-        <SectionWrapper id="explorer" alt>
-          <InteractiveExplorer />
-        </SectionWrapper>
+        {/* 9. Section 06: Interactive Risk & Shift Simulator */}
+        <InteractiveSimulator />
 
-        {/* 9. Comparative Analysis */}
-        <SectionWrapper id="comparative">
-          <ComparativeAnalysis />
-        </SectionWrapper>
+        {/* 10. Section 07: Calibration & Probability Fidelity */}
+        <CalibrationSection />
 
-        {/* 10. Takeaways */}
-        <SectionWrapper id="takeaways" alt>
-          <Takeaways />
-        </SectionWrapper>
+        {/* 11. Section 08: Interpretation (What did not transfer cleanly?) */}
+        <InterpretationSection />
 
-        {/* 11. Methodology */}
-        <SectionWrapper id="methodology">
-          <Methodology />
-        </SectionWrapper>
+        {/* 12. Section 09: Methodological Scope & Rigour */}
+        <LimitationsSection />
 
-        {/* 12. Math Formulation */}
-        <SectionWrapper id="math" alt>
-          <MathFormulation />
-        </SectionWrapper>
-
-        {/* 13. Algorithms */}
-        <SectionWrapper id="algorithms">
-          <Algorithms />
-        </SectionWrapper>
-
-        {/* 14. Conclusion & Future Work */}
-        <SectionWrapper id="conclusion" alt>
-          <ConclusionFuture />
-        </SectionWrapper>
-
-        {/* 15. About & Citation */}
-        <SectionWrapper id="about">
-          <AboutCitation />
-        </SectionWrapper>
+        {/* 13. Section 10: Reproducibility, Code and Data */}
+        <ReproducibilityLinks />
       </main>
 
-      <Footer />
+      {/* 14. Colophon / Footer */}
+      <SiteFooter />
+
+      {/* Apple-style Tactile Back-to-Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-40 p-2.5 bg-[#FCFBF7] border border-[#C9D0C6] text-[#172B29] hover:bg-[#E6ECE4] rounded-xs shadow-[0_4px_16px_rgba(23,43,41,0.08)] btn-tactile cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D6ED8]"
+          aria-label="Back to top"
+        >
+          <ArrowUp className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }

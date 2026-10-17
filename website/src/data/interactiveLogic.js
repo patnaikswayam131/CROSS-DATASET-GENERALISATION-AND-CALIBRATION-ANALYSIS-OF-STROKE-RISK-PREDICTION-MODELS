@@ -7,7 +7,7 @@
  */
 
 // ---------------------------------------------------------------------------
-// Internal metric store — every number is exact from the research outputs
+// Internal metric store  -  every number is exact from the research outputs
 // ---------------------------------------------------------------------------
 
 /**
@@ -158,8 +158,8 @@ export function getMetricData(model, metric) {
 export function getChartData(model, metric) {
   const { inDomain, crossDomain } = getMetricData(model, metric);
   return [
-    { domain: 'In-Domain (Kaggle)', value: inDomain, fill: '#4f8ef7' },
-    { domain: 'Cross-Domain (NHANES)', value: crossDomain, fill: '#7eb3ff' },
+    { domain: 'In-Domain (Kaggle)', value: inDomain, fill: '#94a3b8' },
+    { domain: 'Cross-Domain (NHANES)', value: crossDomain, fill: '#f43f5e' },
   ];
 }
 

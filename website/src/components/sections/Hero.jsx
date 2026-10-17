@@ -1,172 +1,257 @@
-import { heroContent, statPills, heroMetric, heroMiniBar } from '../../data/siteConfig';
+import { useState } from 'react';
+import { motion } from 'motion/react';
+import { heroContent } from '../../data/siteConfig';
 import Button from '../ui/Button';
 import StatPill from '../ui/StatPill';
 import AnimatedNumber from '../ui/AnimatedNumber';
-import MiniBarVisual from '../ui/MiniBarVisual';
+import HeroCanvas from '../ui/HeroCanvas';
 
-/**
- * Hero — full-width landing section with two-column layout.
- * Left: headline, subtitle, CTAs, stat pills.
- * Right: animated metric counter + PR-AUC mini bar visual.
- * Enhanced with particle-like background and better visual hierarchy.
- */
+const HERO_MODELS = [
+  {
+    id: 'lr',
+    name: 'Logistic Regression',
+    collapse: 63.1,
+    inDomain: 0.214,
+    crossDomain: 0.079,
+    ciIn: '0.153–0.308',
+    ciCross: '0.064–0.107',
+    tag: 'Highest Collapse',
+  },
+  {
+    id: 'rf',
+    name: 'Random Forest',
+    collapse: 56.4,
+    inDomain: 0.179,
+    crossDomain: 0.078,
+    ciIn: '0.129–0.251',
+    ciCross: '0.063–0.101',
+    tag: 'Non-linear tree',
+  },
+  {
+    id: 'xgb',
+    name: 'XGBoost',
+    collapse: 51.3,
+    inDomain: 0.158,
+    crossDomain: 0.077,
+    ciIn: '0.115–0.224',
+    ciCross: '0.061–0.107',
+    tag: 'Gradient boosted',
+  },
+];
+
 export function Hero() {
+  const [selectedModel, setSelectedModel] = useState(HERO_MODELS[0]);
+
   return (
     <section
       id="hero"
-      className="relative min-h-[70vh] flex items-center overflow-hidden"
-      style={{ backgroundColor: '#0f1117' }}
+      className="relative min-h-[90vh] flex items-center overflow-hidden bg-[#09090b] pt-8 pb-16 lg:py-20 border-b border-white/[0.08]"
     >
-      {/* ── Background effects ── */}
-      {/* Subtle radial glow — top right */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden="true"
-        style={{
-          background: [
-            'radial-gradient(ellipse 55% 55% at 85% 10%, rgba(79,142,247,0.07) 0%, transparent 70%)',
-            'radial-gradient(ellipse 40% 40% at 15% 80%, rgba(124,106,247,0.04) 0%, transparent 70%)',
-          ].join(','),
-        }}
-      />
-      {/* Subtle grid pattern */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.025]"
-        aria-hidden="true"
-        style={{
-          backgroundImage: `linear-gradient(#4f8ef7 1px, transparent 1px), linear-gradient(90deg, #4f8ef7 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
-        }}
-      />
+      {/* Precision instrumentation canvas */}
+      <HeroCanvas />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20 lg:py-24">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-14 lg:gap-20">
+      {/* Clean architectural grid texture without blur discs */}
+      <div className="pointer-events-none absolute inset-0 bg-editorial-grid opacity-60" />
 
-          {/* ────────── Left Column ────────── */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-12 lg:gap-16">
+
+          {/* ────────── Left Column: Editorial Overview & Theses ────────── */}
           <div className="lg:w-[58%]">
-            {/* Category pill */}
-            <div className="inline-flex items-center gap-2 mb-6">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-[#4f8ef7]"
-                style={{ boxShadow: '0 0 6px rgba(79,142,247,0.8)' }}
-              />
-              <p
-                className="text-xs font-semibold tracking-[0.18em] uppercase text-[#4f8ef7]"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
-                {heroContent.smallLabel}
-              </p>
+            {/* Paper Category & Identifier */}
+            <div className="flex items-center gap-2 text-xs font-mono tracking-wider uppercase text-zinc-400 mb-5">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+              <span>00 / RESEARCH MANUSCRIPT · MEDICAL AI EVALUATION</span>
             </div>
 
-            {/* Main title */}
-            <h1
-              className="text-4xl lg:text-5xl xl:text-[3.25rem] font-bold text-[#e8eaf0] leading-tight mb-5"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}
-            >
-              {heroContent.title}
+            {/* Main Editorial Headline */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-100 leading-[1.12] mb-6 tracking-tight">
+              Cross-Dataset Generalisation &amp; Calibration Failure in Stroke Risk Prediction
             </h1>
 
-            {/* Subtitle */}
-            <p
-              className="text-lg text-[#8b90a4] leading-relaxed mb-3"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
-              {heroContent.subtitle}
+            {/* Subtitle / Empirical Thesis */}
+            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed mb-6 font-normal">
+              High in-domain ROC-AUC (0.81–0.84) creates a dangerous illusion of clinical validity. 
+              When evaluated on the multi-ethnic <strong className="text-white">NHANES 2021–2023</strong> cohort without retraining, 
+              models suffer a catastrophic <span className="text-rose-400 font-semibold border-b border-rose-500/50 pb-0.5">51–63% collapse in Precision-Recall AUC</span>, 
+              revealing severe uncalibrated overconfidence under joint covariate and concept shift.
             </p>
 
-            {/* Author */}
-            <p className="text-sm text-[#8b90a4] mb-8 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="#8b90a4" strokeWidth="1.8" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-              </svg>
-              {heroContent.author}
-            </p>
+            {/* Author & Institutional Metadata */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-zinc-400 mb-8 pb-5 border-b border-white/[0.08] font-mono">
+              <div className="flex items-center gap-2">
+                <span className="text-zinc-100 font-semibold">Swayam Patnaik</span>
+              </div>
+              <span className="text-zinc-600">/</span>
+              <span>NIST University, Berhampur</span>
+              <span className="text-zinc-600">/</span>
+              <span className="text-zinc-300">B.Tech CSE (Data Science)</span>
+              <span className="text-zinc-600">/</span>
+              <span className="text-emerald-400">[Under Peer Review]</span>
+            </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 mb-8">
-              <Button variant="primary" disabled tooltip="Coming Soon — paper under review">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
-                </svg>
-                Read the Paper
+            {/* Action Buttons  -  Crisp Geometric Styling */}
+            <div className="flex flex-wrap items-center gap-3 mb-8">
+              <Button 
+                variant="primary" 
+                href="#explorer"
+                icon={
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                }
+              >
+                Launch Risk Shift Simulator
               </Button>
-              <Button variant="secondary" href={heroContent.githubUrl}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+
+              <Button 
+                variant="secondary" 
+                disabled 
+                tooltip="Manuscript currently under Scopus-indexed peer review"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
                 </svg>
-                View on GitHub
+                Manuscript PDF
+              </Button>
+
+              <Button 
+                variant="ghost" 
+                href={heroContent.githubUrl}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+                Code Repository
               </Button>
             </div>
 
-            {/* Stat Pills */}
-            <div className="flex flex-wrap gap-3">
-              {statPills.map((pill, i) => (
-                <StatPill key={i} text={pill.text} color={pill.color} />
-              ))}
+            {/* Quick Stat Tags */}
+            <div className="flex flex-wrap gap-2">
+              <StatPill text="51–63% PR-AUC Collapse" color="danger" />
+              <StatPill text="3 Core Classifiers Tested" color="primary" />
+              <StatPill text="Age PSI 1.007 & Glucose PSI 1.495" color="warning" />
+              <StatPill text="Held-Out NHANES 2021–23 (N=3,167)" color="neutral" />
             </div>
           </div>
 
-          {/* ────────── Right Column ────────── */}
+          {/* ────────── Right Column: Scientific Instrument Panel ────────── */}
           <div className="lg:w-[42%] flex justify-center lg:justify-end">
-            <div
-              className="w-full max-w-sm rounded-2xl p-8"
-              style={{
-                background: 'rgba(26,29,39,0.8)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(79,142,247,0.2)',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,142,247,0.05), inset 0 1px 0 rgba(255,255,255,0.05)',
-              }}
-            >
-              {/* Top accent line */}
-              <div
-                className="h-0.5 w-16 rounded-full mb-6"
-                style={{ background: 'linear-gradient(90deg, #e05c5c, transparent)' }}
+            <div className="w-full max-w-md rounded-md p-6 bg-[#111114] border border-white/[0.12] shadow-xl relative overflow-hidden">
+              
+              {/* Top Accent Line */}
+              <div 
+                className="absolute top-0 left-0 right-0 h-[2px] bg-rose-500/80" 
               />
 
-              {/* Primary metric */}
-              <div className="text-center mb-2">
-                <div
-                  className="text-6xl lg:text-7xl font-black leading-none"
-                  style={{ color: '#e05c5c', fontFamily: 'var(--font-mono)', textShadow: '0 0 40px rgba(224,92,92,0.3)' }}
-                >
-                  <AnimatedNumber value={heroMetric.value} suffix={heroMetric.unit} />
+              {/* Header with interactive model switch buttons */}
+              <div className="flex items-center justify-between mb-5 pb-3.5 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-rose-500" />
+                  <span className="text-xs uppercase font-mono tracking-wider text-zinc-200 font-semibold">
+                    Empirical Degradation
+                  </span>
+                </div>
+                <span className="text-[11px] px-2 py-0.5 rounded-[3px] bg-rose-500/10 text-rose-400 border border-rose-500/30 font-mono">
+                  p &lt; 0.001
+                </span>
+              </div>
+
+              {/* Model Switcher Tabs  -  Clean Segmented Control */}
+              <div className="grid grid-cols-3 gap-1 p-1 rounded-[4px] bg-[#09090b] border border-white/[0.08] mb-6">
+                {HERO_MODELS.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setSelectedModel(m)}
+                    className={`text-xs py-1.5 px-2 rounded-[2px] font-mono font-medium transition-all cursor-pointer ${
+                      selectedModel.id === m.id
+                        ? 'bg-white text-zinc-950 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    {m.id.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
+              {/* Big primary animated counter */}
+              <div className="text-center mb-1">
+                <div className="text-5xl sm:text-6xl font-bold text-rose-500 font-mono tracking-tight flex items-center justify-center gap-0.5">
+                  <span>-</span>
+                  <AnimatedNumber value={selectedModel.collapse} decimals={1} />
+                  <span className="text-3xl sm:text-4xl">%</span>
                 </div>
               </div>
-              <p className="text-xs text-[#8b90a4] uppercase tracking-widest text-center mb-2">
-                {heroMetric.label}
+
+              <p className="text-xs text-zinc-400 uppercase tracking-widest text-center mb-1 font-mono">
+                PR-AUC Collapse ({selectedModel.name})
               </p>
 
-              {/* Small context note */}
-              <p className="text-xs text-center mb-6 px-2" style={{ color: 'rgba(139,144,164,0.7)' }}>
-                Logistic Regression PR-AUC: 0.214 → 0.079
+              <p className="text-xs text-center mb-6 text-zinc-400 font-mono">
+                Kaggle: <span className="text-zinc-100 font-semibold">{selectedModel.inDomain.toFixed(3)}</span> → NHANES: <span className="text-rose-400 font-semibold">{selectedModel.crossDomain.toFixed(3)}</span>
               </p>
 
-              <div className="border-t border-[#2e3248] my-6" />
+              {/* Comparative Gauge Bars */}
+              <div className="p-4 rounded-md bg-[#09090b] border border-white/[0.08] space-y-3.5 mb-5">
+                <div>
+                  <div className="flex justify-between text-xs mb-1.5">
+                    <span className="text-zinc-300 font-medium flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
+                      In-Domain (Kaggle Test)
+                    </span>
+                    <span className="font-mono text-zinc-100 font-semibold">{selectedModel.inDomain.toFixed(3)}</span>
+                  </div>
+                  <div className="h-2 w-full bg-white/[0.06] rounded-sm overflow-hidden">
+                    <motion.div
+                      className="h-full bg-zinc-200 rounded-sm"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(selectedModel.inDomain / 0.25) * 100}%` }}
+                      transition={{ duration: 0.6, ease: 'easeOut' }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-zinc-500 mt-1 font-mono">
+                    <span>95% CI: [{selectedModel.ciIn}]</span>
+                  </div>
+                </div>
 
-              {/* Mini bar visual */}
-              <MiniBarVisual
-                inDomain={heroMiniBar.inDomain}
-                crossDomain={heroMiniBar.crossDomain}
-                label={heroMiniBar.label}
-              />
-
-              {/* Bottom label */}
-              <div className="mt-5 flex items-center justify-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#e05c5c]" style={{ boxShadow: '0 0 4px rgba(224,92,92,0.7)' }} />
-                <p className="text-xs text-[#8b90a4]">Statistically significant (non-overlapping 95% CIs)</p>
+                <div>
+                  <div className="flex justify-between text-xs mb-1.5">
+                    <span className="text-zinc-300 font-medium flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                      Cross-Domain (NHANES 2021–23)
+                    </span>
+                    <span className="font-mono text-rose-400 font-semibold">{selectedModel.crossDomain.toFixed(3)}</span>
+                  </div>
+                  <div className="h-2 w-full bg-white/[0.06] rounded-sm overflow-hidden">
+                    <motion.div
+                      className="h-full bg-rose-500 rounded-sm"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(selectedModel.crossDomain / 0.25) * 100}%` }}
+                      transition={{ duration: 0.6, ease: 'easeOut' }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-zinc-500 mt-1 font-mono">
+                    <span>95% CI: [{selectedModel.ciCross}]</span>
+                  </div>
+                </div>
               </div>
+
+              {/* Statistical confirmation footer */}
+              <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/[0.08]">
+                <span className="flex items-center gap-1.5 text-emerald-400 text-[11px] font-mono">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  Non-overlapping 95% CIs
+                </span>
+                <span className="font-mono text-[11px] text-zinc-500">B = 1,000 Folds</span>
+              </div>
+
             </div>
           </div>
 
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-        <p className="text-xs text-[#8b90a4] tracking-widest uppercase">Scroll</p>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="#8b90a4" strokeWidth="1.8" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
       </div>
     </section>
   );

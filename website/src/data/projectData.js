@@ -3,30 +3,30 @@
  *
  * Contains every research number, table, prose block, and structural
  * content item referenced by the website's section components.
- * All values are exact — nothing is rounded or approximated.
+ * All values are exact  -  nothing is rounded or approximated.
  *
  * @module projectData
  */
 
 // ────────────────────────────────────────────────────────────
-//  Table 3 — Core Performance Metrics
+//  Table 3  -  Core Performance Metrics
 // ────────────────────────────────────────────────────────────
 
 /**
  * @typedef {Object} MetricRow
- * @property {string} model        — Classifier name
- * @property {number} rocK         — ROC-AUC on Kaggle test set
- * @property {string} rocKCI       — 95 % bootstrap CI (Kaggle)
- * @property {number} rocN         — ROC-AUC on NHANES
- * @property {string} rocNCI       — 95 % bootstrap CI (NHANES)
- * @property {number} prK          — PR-AUC on Kaggle test set
- * @property {string} prKCI        — 95 % bootstrap CI (Kaggle)
- * @property {number} prN          — PR-AUC on NHANES
- * @property {string} prNCI        — 95 % bootstrap CI (NHANES)
- * @property {number} brierK       — Brier score on Kaggle test set
- * @property {number} brierN       — Brier score on NHANES
- * @property {number} eceK         — ECE on Kaggle test set
- * @property {number} eceN         — ECE on NHANES
+ * @property {string} model         -  Classifier name
+ * @property {number} rocK          -  ROC-AUC on Kaggle test set
+ * @property {string} rocKCI        -  95 % bootstrap CI (Kaggle)
+ * @property {number} rocN          -  ROC-AUC on NHANES
+ * @property {string} rocNCI        -  95 % bootstrap CI (NHANES)
+ * @property {number} prK           -  PR-AUC on Kaggle test set
+ * @property {string} prKCI         -  95 % bootstrap CI (Kaggle)
+ * @property {number} prN           -  PR-AUC on NHANES
+ * @property {string} prNCI         -  95 % bootstrap CI (NHANES)
+ * @property {number} brierK        -  Brier score on Kaggle test set
+ * @property {number} brierN        -  Brier score on NHANES
+ * @property {number} eceK          -  ECE on Kaggle test set
+ * @property {number} eceN          -  ECE on NHANES
  */
 
 /** @type {MetricRow[]} */
@@ -61,16 +61,16 @@ export const coreMetrics = [
 ];
 
 // ────────────────────────────────────────────────────────────
-//  Table 4 — Distribution Shift Analysis
+//  Table 4  -  Distribution Shift Analysis
 // ────────────────────────────────────────────────────────────
 
 /**
  * @typedef {Object} ShiftRow
- * @property {string} feature       — Feature name
- * @property {number} ksStatistic   — Kolmogorov-Smirnov statistic
- * @property {string} ksPValue      — KS p-value (scientific notation string)
- * @property {number} psi           — Population Stability Index
- * @property {string} severity      — Shift severity label
+ * @property {string} feature        -  Feature name
+ * @property {number} ksStatistic    -  Kolmogorov-Smirnov statistic
+ * @property {string} ksPValue       -  KS p-value (scientific notation string)
+ * @property {number} psi            -  Population Stability Index
+ * @property {string} severity       -  Shift severity label
  */
 
 /** @type {ShiftRow[]} */
@@ -87,10 +87,10 @@ export const shiftAnalysis = [
 
 /**
  * @typedef {Object} AblationRow
- * @property {string} configuration — Model configuration label
- * @property {number} kaggleAuc     — ROC-AUC on Kaggle test set
- * @property {number} nhanesAuc     — ROC-AUC on NHANES
- * @property {number} gap           — AUC gap (Kaggle − NHANES)
+ * @property {string} configuration  -  Model configuration label
+ * @property {number} kaggleAuc      -  ROC-AUC on Kaggle test set
+ * @property {number} nhanesAuc      -  ROC-AUC on NHANES
+ * @property {number} gap            -  AUC gap (Kaggle − NHANES)
  */
 
 /** @type {AblationRow[]} */
@@ -103,15 +103,15 @@ export const ablationStudy = [
 ];
 
 // ────────────────────────────────────────────────────────────
-//  Concept Shift — Feature Patching (XGBoost)
+//  Concept Shift  -  Feature Patching (XGBoost)
 // ────────────────────────────────────────────────────────────
 
 /**
  * @typedef {Object} ConceptShiftRow
- * @property {string} feature    — Feature name
- * @property {number} delta      — Change in ROC-AUC after patching
- * @property {number} baseAuc    — Baseline cross-domain ROC-AUC
- * @property {number} patchedAuc — ROC-AUC after patching feature
+ * @property {string} feature     -  Feature name
+ * @property {number} delta       -  Change in ROC-AUC after patching
+ * @property {number} baseAuc     -  Baseline cross-domain ROC-AUC
+ * @property {number} patchedAuc  -  ROC-AUC after patching feature
  */
 
 /** @type {ConceptShiftRow[]} */
@@ -128,12 +128,12 @@ export const conceptShiftData = [
 
 /**
  * @typedef {Object} CalibrationRow
- * @property {string} model          — Classifier name
- * @property {number} baseline       — Baseline cross-domain ROC-AUC
- * @property {number} platt          — ROC-AUC after Platt scaling
- * @property {number} isotonic       — ROC-AUC after isotonic regression
- * @property {number} plattDelta     — Change from baseline (Platt)
- * @property {number} isotonicDelta  — Change from baseline (isotonic)
+ * @property {string} model           -  Classifier name
+ * @property {number} baseline        -  Baseline cross-domain ROC-AUC
+ * @property {number} platt           -  ROC-AUC after Platt scaling
+ * @property {number} isotonic        -  ROC-AUC after isotonic regression
+ * @property {number} plattDelta      -  Change from baseline (Platt)
+ * @property {number} isotonicDelta   -  Change from baseline (isotonic)
  */
 
 /** @type {CalibrationRow[]} */
@@ -144,7 +144,7 @@ export const calibrationData = [
 ];
 
 // ────────────────────────────────────────────────────────────
-//  Problem Section — Prose & Pipeline
+//  Problem Section  -  Prose & Pipeline
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -154,16 +154,16 @@ export const calibrationData = [
 export const problemParagraphs = [
   'Machine learning models for stroke prediction are typically evaluated on held-out splits of the same dataset they were trained on. This creates an illusion of performance: the model never encounters a distribution it has not already learned. In clinical deployment, however, the target population is almost never the same as the training population. Age distributions differ, measurement protocols vary, and disease definitions change between institutions.',
   'Dataset shift occurs when the joint distribution P(X,Y) differs between training and deployment. This encompasses covariate shift (different feature distributions), prior probability shift (different class prevalence), and concept shift (different relationships between features and outcomes). Standard held-out evaluation, no matter how rigorous the train-test split, cannot detect any of these failure modes because both sets are drawn from the same source.',
-  'For rare events like stroke (4–5% prevalence), ROC-AUC is misleadingly optimistic. It credits the model for correctly identifying the overwhelming majority of non-stroke cases, which any trivial classifier can achieve. PR-AUC, by contrast, evaluates only the precision-recall trade-off for the minority class. When a model achieves PR-AUC of 0.077 on the target population, it offers only 1.9× the performance of a random classifier — a finding that ROC-AUC of 0.709 completely conceals.',
+  'For rare events like stroke (4–5% prevalence), ROC-AUC is misleadingly optimistic. It credits the model for correctly identifying the overwhelming majority of non-stroke cases, which any trivial classifier can achieve. PR-AUC, by contrast, evaluates only the precision-recall trade-off for the minority class. When a model achieves PR-AUC of 0.077 on the target population, it offers only 1.9× the performance of a random classifier  -  a finding that ROC-AUC of 0.709 completely conceals.',
 ];
 
 /**
  * Steps shown in the pipeline infographic in the Problem section.
  * @typedef {Object} PipelineStep
- * @property {string}  label       — Step heading
- * @property {string}  description — Short descriptor
- * @property {string}  icon        — Icon identifier
- * @property {boolean} [dashed]    — Whether the connector is dashed
+ * @property {string}  label        -  Step heading
+ * @property {string}  description  -  Short descriptor
+ * @property {string}  icon         -  Icon identifier
+ * @property {boolean} [dashed]     -  Whether the connector is dashed
  */
 
 /** @type {PipelineStep[]} */
@@ -180,14 +180,14 @@ export const pipelineSteps = [
 
 /**
  * @typedef {Object} DatasetCard
- * @property {string}   title        — Card heading
- * @property {string}   [tag]        — Optional label badge
- * @property {string}   [tagColor]   — Badge colour key
- * @property {Object}   [stats]      — Key-value statistics
- * @property {string}   description  — Prose description
- * @property {string[]} [features]   — Feature list
- * @property {string[]} [modules]    — NHANES module identifiers
- * @property {Object[]} [mapping]    — Feature-name mapping (harmonisation)
+ * @property {string}   title         -  Card heading
+ * @property {string}   [tag]         -  Optional label badge
+ * @property {string}   [tagColor]    -  Badge colour key
+ * @property {Object}   [stats]       -  Key-value statistics
+ * @property {string}   description   -  Prose description
+ * @property {string[]} [features]    -  Feature list
+ * @property {string[]} [modules]     -  NHANES module identifiers
+ * @property {Object[]} [mapping]     -  Feature-name mapping (harmonisation)
  */
 
 /** @type {DatasetCard[]} */
@@ -198,7 +198,7 @@ export const datasetCards = [
     tagColor: 'primary',
     stats: { records: '5,109', prevalence: '4.87%', features: '4 harmonised features' },
     description:
-      'The Kaggle Stroke Prediction Dataset is a widely-used benchmark containing demographic and clinical features. Models were trained on an 80/20 stratified split with SMOTE oversampling applied to the training fold only.',
+      'The Kaggle Stroke Prediction Dataset comprises 5,109 records (one removed for unrecognized gender value) with 4.87% prevalence. Models were trained on a stratified 70/30 split (N = 3,576 training, N = 1,533 test, seed = 42) with IterativeImputer and StandardScaler fitted exclusively on the source training split.',
     features: ['age', 'gender', 'bmi', 'avg_glucose_level'],
   },
   {
@@ -236,7 +236,7 @@ export const resultsCallouts = {
   performance:
     'PR-AUC collapsed 51–63% under domain shift. At NHANES prevalence of 4.1%, the cross-domain models achieved only 1.9× the random classifier baseline.',
   shiftAnalysis:
-    'The glucose PSI of 1.495 reflects a definitional mismatch between datasets — Kaggle uses unspecified glucose readings while NHANES uses fasting plasma glucose. This is not a correctable population difference; it is a measurement protocol incompatibility that compromises external validation.',
+    'The glucose PSI of 1.495 reflects a definitional mismatch between datasets  -  Kaggle uses unspecified glucose readings while NHANES uses fasting plasma glucose. This is not a correctable population difference; it is a measurement protocol incompatibility that compromises external validation.',
   ablation:
     'Removing BMI widens the gap to 0.113. Removing glucose reduces it by only 0.002 despite its PSI of 1.495. PSI magnitude does not predict gap contribution.',
 };
@@ -247,9 +247,9 @@ export const resultsCallouts = {
 
 /**
  * @typedef {Object} TakeawayCard
- * @property {string} icon  — Heroicon identifier
- * @property {string} title — Card heading
- * @property {string} body  — Card body text
+ * @property {string} icon   -  Heroicon identifier
+ * @property {string} title  -  Card heading
+ * @property {string} body   -  Card body text
  */
 
 /** @type {TakeawayCard[]} */
@@ -277,8 +277,8 @@ export const takeawayCards = [
 
 /**
  * @typedef {Object} MethodologyItem
- * @property {string} title   — Accordion heading
- * @property {string} content — Accordion body text
+ * @property {string} title    -  Accordion heading
+ * @property {string} content  -  Accordion body text
  */
 
 /** @type {MethodologyItem[]} */
@@ -296,12 +296,12 @@ export const methodologyItems = [
   {
     title: 'Feature Harmonisation',
     content:
-      'Four features were harmonised across datasets: age, gender, BMI, and average glucose level. The primary confound is glucose measurement — Kaggle contains unspecified glucose readings while NHANES reports fasting plasma glucose (LBXGLU). This definitional mismatch is the primary source of the 1.495 PSI observed for glucose.',
+      'Four features were harmonised across datasets: age, gender, BMI, and average glucose level. The primary confound is glucose measurement  -  Kaggle contains unspecified glucose readings while NHANES reports fasting plasma glucose (LBXGLU). This definitional mismatch is the primary source of the 1.495 PSI observed for glucose.',
   },
   {
-    title: 'Models',
+    title: 'Models & Imbalance Handling',
     content:
-      'Three classifiers were evaluated: Logistic Regression (C=1.0, max_iter=1000), Random Forest (n_estimators=200, max_depth=10, min_samples_leaf=5), and XGBoost (n_estimators=200, max_depth=4, learning_rate=0.1, scale_pos_weight=19.5). SMOTE oversampling was applied to the training fold only.',
+      'Three classifiers were evaluated with cost-sensitive class weighting: Logistic Regression (C=1.0, class_weight=balanced), Random Forest (n_estimators=200, max_depth=6, class_weight=balanced), and XGBoost (n_estimators=200, max_depth=4, learning_rate=0.1, scale_pos_weight=19.6). Class weighting was selected following Carriero et al. (2024) to avoid synthetic oversampling artifacts.',
   },
   {
     title: 'Evaluation Protocol',
@@ -311,7 +311,7 @@ export const methodologyItems = [
   {
     title: 'Shift Analysis',
     content:
-      'Distribution shift was quantified using the Kolmogorov-Smirnov (KS) test for statistical significance and Population Stability Index (PSI) for magnitude. PSI thresholds: <0.10 stable, 0.10–0.25 moderate, >0.25 severe. A logistic regression domain classifier achieved 82.1% accuracy (random baseline: 50%), confirming the datasets are distinguishable.',
+      'Distribution shift was characterised using Kolmogorov-Smirnov (KS) tests and Population Stability Index (PSI). Two features (age PSI: 1.007 and glucose PSI: 1.495) exhibit severe shift. A Random Forest domain classifier achieved cross-validated AUC of 0.858 ± 0.014, while label shift was non-significant (chi-square p = 0.149), ruling out prior probability shift as the primary culprit.',
   },
   {
     title: 'Concept Shift Test',
@@ -326,7 +326,7 @@ export const methodologyItems = [
 ];
 
 // ────────────────────────────────────────────────────────────
-//  Interactive Explorer — Dynamic Summaries
+//  Interactive Explorer  -  Dynamic Summaries
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -356,7 +356,7 @@ export const dynamicSummaries = {
   xgb_roc:
     'XGBoost achieved ROC-AUC of 0.808 in-domain. Under domain shift, this dropped to 0.709 on NHANES, a 12.3% reduction. While this appears comparable to other models, XGBoost showed the most dramatic failure in other metrics.',
   xgb_pr:
-    'XGBoost achieved PR-AUC of 0.158 in-domain. Under domain shift, this collapsed to 0.077, a 51.3% reduction. At 4.1% prevalence, this offers only 1.9× the random classifier baseline — near-trivial minority-class detection.',
+    'XGBoost achieved PR-AUC of 0.158 in-domain. Under domain shift, this collapsed to 0.077, a 51.3% reduction. At 4.1% prevalence, this offers only 1.9× the random classifier baseline  -  near-trivial minority-class detection.',
   xgb_brier:
     'XGBoost achieved the best Brier score of 0.098 in-domain. On NHANES, this worsened to 0.123, a 25.5% increase. Despite being the least degraded Brier score, the calibration analysis reveals this masks severe issues.',
   xgb_ece:
@@ -369,9 +369,9 @@ export const dynamicSummaries = {
 
 /**
  * @typedef {Object} MetricExplanation
- * @property {string} name        — Short display name
- * @property {string} full        — Full metric name
- * @property {string} explanation — Multi-sentence plain-language explanation
+ * @property {string} name         -  Short display name
+ * @property {string} full         -  Full metric name
+ * @property {string} explanation  -  Multi-sentence plain-language explanation
  */
 
 /** @type {Record<string, MetricExplanation>} */
@@ -392,13 +392,13 @@ export const metricExplanations = {
     name: 'Brier Score',
     full: 'Brier Score (Mean Squared Error of Probabilities)',
     explanation:
-      'The Brier score measures the mean squared difference between predicted probabilities and actual outcomes. It ranges from 0 (perfect calibration) to 1 (worst). A well-calibrated model should produce predicted probabilities that match observed frequencies — e.g., among patients assigned 20% stroke risk, approximately 20% should actually have strokes. Lower Brier scores indicate better calibrated probability estimates.',
+      'The Brier score measures the mean squared difference between predicted probabilities and actual outcomes. It ranges from 0 (perfect calibration) to 1 (worst). A well-calibrated model should produce predicted probabilities that match observed frequencies  -  e.g., among patients assigned 20% stroke risk, approximately 20% should actually have strokes. Lower Brier scores indicate better calibrated probability estimates.',
   },
   ece: {
     name: 'ECE',
     full: 'Expected Calibration Error',
     explanation:
-      'Expected Calibration Error divides predictions into bins by predicted probability, then measures the average absolute difference between predicted probability and actual frequency within each bin. ECE of 0.40 means predicted probabilities deviate from true frequencies by 40 percentage points on average. For clinical decision-making, well-calibrated probabilities are essential — a clinician needs to trust that a 15% predicted risk actually corresponds to roughly 15% true risk.',
+      'Expected Calibration Error divides predictions into bins by predicted probability, then measures the average absolute difference between predicted probability and actual frequency within each bin. ECE of 0.40 means predicted probabilities deviate from true frequencies by 40 percentage points on average. For clinical decision-making, well-calibrated probabilities are essential  -  a clinician needs to trust that a 15% predicted risk actually corresponds to roughly 15% true risk.',
   },
 };
 

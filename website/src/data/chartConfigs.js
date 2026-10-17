@@ -1,7 +1,7 @@
 /**
  * @fileoverview Recharts-ready data arrays and configuration objects for the
  * stroke-prediction research showcase. Every numeric value is taken verbatim
- * from the research outputs — do NOT round or approximate.
+ * from the research outputs  -  do NOT round or approximate.
  *
  * @module chartConfigs
  */
@@ -12,18 +12,18 @@
 
 /** @type {Record<string, string>} Shared colour constants used across all charts. */
 const COLORS = {
-  kaggle: '#4f8ef7',
-  nhanes: '#7eb3ff',
-  kaggleAlt: '#6366f1',
-  nhanesAlt: '#a5b4fc',
-  danger: '#e05c5c',
-  success: '#4caf82',
-  warning: '#e8a838',
-  neutral: '#8b90a4',
-  surface: '#1a1d27',
-  border: '#2e3248',
-  text: '#e8eaf0',
-  textSecondary: '#8b90a4',
+  kaggle: '#94a3b8',      // Slate / Cool Platinum (Source In-Domain)
+  nhanes: '#f43f5e',      // Clinical Crimson / Rose (Target Cross-Domain Collapse)
+  kaggleAlt: '#71717a',
+  nhanesAlt: '#fb7185',
+  danger: '#f43f5e',
+  success: '#10b981',
+  warning: '#f59e0b',
+  neutral: '#71717a',
+  surface: '#111114',
+  border: 'rgba(255, 255, 255, 0.08)',
+  text: '#f4f4f6',
+  textSecondary: '#a1a1aa',
 };
 export { COLORS };
 
@@ -143,16 +143,17 @@ export const calibrationChartData = [
  */
 export const tooltipStyle = {
   contentStyle: {
-    backgroundColor: '#1a1d27',
-    border: '1px solid #2e3248',
-    borderRadius: '8px',
-    color: '#e8eaf0',
-    fontFamily: 'Inter, system-ui, sans-serif',
-    fontSize: '0.85rem',
-    padding: '0.75rem 1rem',
+    backgroundColor: '#111114',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    borderRadius: '4px',
+    color: '#f4f4f6',
+    fontFamily: 'var(--font-mono, monospace)',
+    fontSize: '0.8rem',
+    padding: '0.6rem 0.85rem',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
   },
-  itemStyle: { color: '#e8eaf0' },
-  labelStyle: { color: '#8b90a4', fontWeight: 600, marginBottom: '0.25rem' },
+  itemStyle: { color: '#f4f4f6' },
+  labelStyle: { color: '#a1a1aa', fontWeight: 600, marginBottom: '0.25rem', fontFamily: 'var(--font-mono, monospace)' },
 };
 
 // ---------------------------------------------------------------------------
@@ -164,9 +165,9 @@ export const tooltipStyle = {
  * @type {{tick: object, axisLine: object, tickLine: object}}
  */
 export const axisStyle = {
-  tick: { fill: '#8b90a4', fontSize: 12, fontFamily: 'Inter, system-ui, sans-serif' },
-  axisLine: { stroke: '#2e3248' },
-  tickLine: { stroke: '#2e3248' },
+  tick: { fill: '#71717a', fontSize: 11, fontFamily: 'var(--font-mono, monospace)' },
+  axisLine: { stroke: 'rgba(255, 255, 255, 0.08)' },
+  tickLine: { stroke: 'rgba(255, 255, 255, 0.08)' },
 };
 
 // ---------------------------------------------------------------------------
@@ -178,7 +179,7 @@ export const axisStyle = {
  * @type {{strokeDasharray: string, stroke: string, opacity: number}}
  */
 export const gridStyle = {
-  strokeDasharray: '3 3',
-  stroke: '#2e3248',
-  opacity: 0.5,
+  strokeDasharray: '2 2',
+  stroke: 'rgba(255, 255, 255, 0.06)',
+  opacity: 1,
 };

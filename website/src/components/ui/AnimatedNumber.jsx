@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useScrollAnimation } from '../../hooks/useScrollAnimation';
 
 /**
- * AnimatedNumber — counts up from 0 to target value on scroll.
+ * AnimatedNumber  -  counts up from 0 to target value on scroll.
  * @param {{ value: number, duration: number, suffix: string, prefix: string, decimals: number }} props
  */
 export function AnimatedNumber({ value, duration = 1500, suffix = '', prefix = '', decimals = 0 }) {

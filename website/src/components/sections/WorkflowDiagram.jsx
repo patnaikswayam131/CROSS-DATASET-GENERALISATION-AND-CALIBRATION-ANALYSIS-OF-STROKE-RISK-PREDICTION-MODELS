@@ -1,58 +1,72 @@
+import { useState } from 'react';
+import { LightboxModal } from '../ui/LightboxModal';
+
 /**
- * WorkflowDiagram — SVG recreation of the 5-phase cross-domain evaluation pipeline.
+ * WorkflowDiagram  -  SVG recreation of the 5-phase cross-domain evaluation pipeline.
  * Faithful to the original orientation, arrows, and box contents.
  * Colour scheme remapped to the website dark theme.
- *
- * Original colours → Website mapping:
- *   Orange/amber boxes (datasets) → #e8a838 (warning)
- *   Blue boxes (core pipeline)    → #4f8ef7 (primary)
- *   Dashed box (NHANES held out)  → #2e3248 border, transparent bg
- *   Green boxes (analysis)        → #4caf82 (success)
- *   Purple box (conclusion)       → #7c6af7 (violet accent)
  */
 export function WorkflowDiagram() {
-  // ─── Shared style constants ──────────────────────────────────
-  const BG_ORANGE  = '#1a1409';   // dark amber tint bg
-  const BG_BLUE    = '#0d1625';   // dark blue tint bg
-  const BG_GREEN   = '#0a1a12';   // dark green tint bg
-  const BG_PURPLE  = '#150f2e';   // dark purple tint bg
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // ─── Shared style constants  -  Swiss Editorial Obsidian Palette ──────────────
+  const BG_ORANGE  = '#121214';   // Phase 1 (Ingestion)
+  const BG_BLUE    = '#141418';   // Phase 2 (Preprocessing)
+  const BG_GREEN   = '#111613';   // Phase 3 & 4 (Models & Evaluation)
+  const BG_PURPLE  = '#181114';   // Phase 5 (Shift Diagnosis)
   const BG_DASHED  = 'transparent';
 
-  const STROKE_ORANGE = '#e8a838';
-  const STROKE_BLUE   = '#4f8ef7';
-  const STROKE_GREEN  = '#4caf82';
-  const STROKE_PURPLE = '#7c6af7';
-  const STROKE_DASHED = '#2e3248';
+  const STROKE_ORANGE = 'rgba(255, 255, 255, 0.15)';
+  const STROKE_BLUE   = '#94a3b8';
+  const STROKE_GREEN  = '#10b981';
+  const STROKE_PURPLE = '#f43f5e';
+  const STROKE_DASHED = 'rgba(255, 255, 255, 0.12)';
 
-  const TEXT_ORANGE = '#e8a838';
-  const TEXT_BLUE   = '#7eb3ff';
-  const TEXT_GREEN  = '#4caf82';
-  const TEXT_PURPLE = '#a89cf8';
-  const TEXT_MUTED  = '#8b90a4';
+  const TEXT_ORANGE = '#e2e8f0';
+  const TEXT_BLUE   = '#cbd5e1';
+  const TEXT_GREEN  = '#6ee7b7';
+  const TEXT_PURPLE = '#fda4af';
+  const TEXT_MUTED  = '#71717a';
 
-  const ARROW_ORANGE = '#e8a838';
-  const ARROW_BLUE   = '#4f8ef7';
-  const ARROW_GREEN  = '#4caf82';
+  const ARROW_ORANGE = 'rgba(255, 255, 255, 0.25)';
+  const ARROW_BLUE   = '#94a3b8';
+  const ARROW_GREEN  = '#10b981';
 
-  const rx = 8; // border-radius for rects
+  const rx = 4; // sharp border-radius for technical architecture nodes
 
   return (
-    <section id="workflow" className="max-w-4xl py-20 px-6 mx-auto">
+    <section id="workflow" className="max-w-5xl py-20 px-6 mx-auto">
       {/* Section label */}
-      <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#4f8ef7] mb-3">
-        Methodology
-      </p>
-      <h2 className="text-3xl md:text-4xl font-bold text-[#e8eaf0] mb-4">
-        Cross-Domain Evaluation Pipeline
-      </h2>
-      <p className="text-sm text-[#8b90a4] mb-10 max-w-2xl">
-        Five-phase workflow from data ingestion through shift analysis. The dashed box indicates
-        NHANES is held out throughout training — never used for fitting any parameter.
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-mono tracking-wider uppercase text-zinc-400 mb-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+            <span>01 / METHODOLOGICAL FRAMEWORK · FIVE-PHASE PIPELINE</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-zinc-100 tracking-tight">
+            Cross-Domain Evaluation Pipeline
+          </h2>
+          <p className="text-sm md:text-base text-zinc-400 mt-2 max-w-2xl leading-relaxed">
+            Strict five-phase workflow from independent data ingestion through shift diagnosis. The dashed boundary indicates
+            the NHANES cohort is held out throughout model fitting  -  never used for preprocessing, tuning, or threshold selection.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="self-start sm:self-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-mono font-medium bg-white/[0.04] border border-white/10 hover:border-white/20 hover:bg-white/[0.08] text-zinc-300 hover:text-white transition-all cursor-pointer shadow-sm"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <span>Manuscript Schematic</span>
+        </button>
+      </div>
 
       <div
-        className="rounded-xl overflow-hidden border border-[#2e3248] p-4 md:p-8"
-        style={{ backgroundColor: '#0f1117' }}
+        className="rounded-md overflow-hidden border border-white/[0.08] p-4 md:p-8"
+        style={{ backgroundColor: '#111114' }}
       >
         <svg
           viewBox="0 0 620 1120"
@@ -223,6 +237,14 @@ export function WorkflowDiagram() {
 
         </svg>
       </div>
+
+      <LightboxModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        imageSrc="/figures/workflow.png"
+        title="Five-Phase Cross-Domain Evaluation Pipeline"
+        caption="Complete methodological workflow illustrating Kaggle training, NHANES held-out evaluation, Kolmogorov-Smirnov and PSI distribution shift testing, and post-hoc calibration."
+      />
     </section>
   );
 }

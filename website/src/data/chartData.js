@@ -5,7 +5,7 @@
  * pre-computed structures optimised for chart/visualisation components
  * (bar charts, grouped comparisons, waterfall plots, etc.).
  *
- * All numbers are derived directly from the source tables — nothing
+ * All numbers are derived directly from the source tables  -  nothing
  * is rounded or approximated.
  *
  * @module chartData
@@ -20,7 +20,7 @@ import {
 } from './projectData.js';
 
 // ────────────────────────────────────────────────────────────
-//  Grouped Bar — ROC-AUC comparison (Kaggle vs NHANES)
+//  Grouped Bar  -  ROC-AUC comparison (Kaggle vs NHANES)
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -38,7 +38,7 @@ export const rocComparisonBars = coreMetrics.map((m) => ({
 }));
 
 // ────────────────────────────────────────────────────────────
-//  Grouped Bar — PR-AUC comparison (Kaggle vs NHANES)
+//  Grouped Bar  -  PR-AUC comparison (Kaggle vs NHANES)
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -58,7 +58,7 @@ export const prComparisonBars = coreMetrics.map((m) => ({
 }));
 
 // ────────────────────────────────────────────────────────────
-//  PSI Severity — Horizontal Bar / Heatmap
+//  PSI Severity  -  Horizontal Bar / Heatmap
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -86,7 +86,7 @@ export const psiThresholds = {
 };
 
 // ────────────────────────────────────────────────────────────
-//  Ablation — Waterfall / Paired Bar
+//  Ablation  -  Waterfall / Paired Bar
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -101,7 +101,7 @@ export const ablationWaterfall = ablationStudy.map((a) => ({
 }));
 
 // ────────────────────────────────────────────────────────────
-//  Concept Shift — Horizontal Diverging Bar
+//  Concept Shift  -  Horizontal Diverging Bar
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -116,7 +116,7 @@ export const conceptShiftBars = conceptShiftData.map((c) => ({
 }));
 
 // ────────────────────────────────────────────────────────────
-//  Calibration — Grouped Bar / Dot Plot
+//  Calibration  -  Grouped Bar / Dot Plot
 // ────────────────────────────────────────────────────────────
 
 /**
@@ -136,7 +136,7 @@ export const calibrationChart = calibrationData.map((c) => ({
 }));
 
 // ────────────────────────────────────────────────────────────
-//  Interactive Explorer — per-metric data slices
+//  Interactive Explorer  -  per-metric data slices
 // ────────────────────────────────────────────────────────────
 
 /**

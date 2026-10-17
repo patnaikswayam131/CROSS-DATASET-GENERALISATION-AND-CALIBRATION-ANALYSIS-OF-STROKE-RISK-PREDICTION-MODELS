@@ -4,7 +4,7 @@ import {
 import { COLORS, tooltipStyle, axisStyle, gridStyle } from '../../data/chartConfigs';
 
 /**
- * Grouped bar chart for ablation study — Kaggle vs NHANES AUC per configuration.
+ * Grouped bar chart for ablation study  -  Kaggle vs NHANES AUC per configuration.
  * Full model is highlighted differently from ablated versions.
  * @param {{ data: Array, title: string, height: number }} props
  */

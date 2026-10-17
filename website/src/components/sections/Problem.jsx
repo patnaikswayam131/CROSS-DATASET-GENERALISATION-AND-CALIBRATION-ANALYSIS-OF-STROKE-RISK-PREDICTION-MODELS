@@ -36,49 +36,50 @@ const icons = {
 };
 
 /**
- * Problem — explains why cross-dataset evaluation matters.
+ * Problem  -  explains why cross-dataset evaluation matters.
  * Left: prose paragraphs.  Right: vertical pipeline infographic.
  */
 export function Problem() {
   return (
-    <section id="problem" className="py-20 px-6" style={{ backgroundColor: '#0f1117' }}>
+    <div className="py-20 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-          {/* ──────── Left Column — Text (55%) ──────── */}
+          {/* ──────── Left Column  -  Text (55%) ──────── */}
           <div className="lg:w-[55%]">
-            <p className="section-label">WHY THIS MATTERS</p>
+            <div className="flex items-center gap-2 text-xs font-mono tracking-wider uppercase text-zinc-400 mb-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+              <span>02 / MOTIVATION &amp; CLINICAL PROBLEM</span>
+            </div>
 
             <h2
-              className="text-3xl font-bold text-[#e8eaf0] mt-3 mb-8"
-              style={{ fontFamily: 'var(--font-heading)' }}
+              className="text-3xl md:text-4xl font-bold text-zinc-100 mt-2 mb-8 tracking-tight"
             >
-              Models that look excellent in testing can be nearly useless in deployment
+              Models that evaluate well in-domain can be dangerously unviable in clinical deployment
             </h2>
 
             {problemParagraphs.map((paragraph, i) => (
-              <p key={i} className="text-[#8b90a4] text-base leading-relaxed mb-6">
+              <p key={i} className="text-zinc-400 text-base leading-relaxed mb-6 font-normal">
                 {paragraph}
               </p>
             ))}
           </div>
 
-          {/* ──────── Right Column — Pipeline (45%) ──────── */}
+          {/* ──────── Right Column  -  Pipeline (45%) ──────── */}
           <div className="lg:w-[45%] flex justify-center">
-            <div className="flex flex-col items-center w-full max-w-xs">
+            <div className="flex flex-col items-center w-full max-w-sm">
               {pipelineSteps.map((step, i) => (
                 <div key={i} className="flex flex-col items-center w-full">
                   {/* Connector line (above each step except the first) */}
                   {i > 0 && (
                     <div
-                      className="w-0.5 h-6 mx-auto"
+                      className="w-px h-6 mx-auto"
                       style={{
-                        backgroundColor: '#2e3248',
+                        backgroundColor: step.dashed ? 'transparent' : 'rgba(255, 255, 255, 0.12)',
                         ...(step.dashed
                           ? {
                               backgroundImage:
-                                'repeating-linear-gradient(to bottom, #2e3248 0, #2e3248 4px, transparent 4px, transparent 8px)',
-                              backgroundColor: 'transparent',
+                                'repeating-linear-gradient(to bottom, rgba(255,255,255,0.15) 0, rgba(255,255,255,0.15) 3px, transparent 3px, transparent 6px)',
                             }
                           : {}),
                       }}
@@ -88,23 +89,23 @@ export function Problem() {
                   {/* Step card */}
                   <div
                     className={`
-                      w-full bg-[#1a1d27] rounded-lg p-4
+                      w-full bg-[#111114] rounded-md p-4
                       border
-                      ${step.dashed ? 'border-dashed border-[#2e3248]' : 'border-[#2e3248]'}
+                      ${step.dashed ? 'border-dashed border-rose-500/30' : 'border-white/[0.08]'}
                     `}
                   >
                     <div className="flex items-start gap-3">
                       {/* Icon */}
-                      <div className="flex-shrink-0 text-[#4f8ef7] mt-0.5">
+                      <div className="flex-shrink-0 text-zinc-300 mt-0.5">
                         {icons[step.icon] || null}
                       </div>
 
                       {/* Text */}
                       <div>
-                        <p className="font-semibold text-[#e8eaf0] text-sm">
+                        <p className="font-semibold text-zinc-100 text-sm">
                           {step.label}
                         </p>
-                        <p className="text-xs text-[#8b90a4] mt-0.5">
+                        <p className="text-xs text-zinc-400 mt-0.5 font-mono">
                           {step.description}
                         </p>
                       </div>
@@ -117,7 +118,7 @@ export function Problem() {
 
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
