@@ -298,8 +298,8 @@ export default function HeroResearchSummary() {
                   <line x1="40" y1="20" x2="40" y2="210" stroke="#111816" strokeWidth="1" />
 
                   {/* Prevalence baseline */}
-                  <line x1="40" y1={(20 + (1 - 0.041) * 190).toFixed(1)} x2="320" y2={(20 + (1 - 0.041) * 190).toFixed(1)} stroke="#A33B20" strokeWidth="1.2" strokeDasharray="3 3" />
-                  <text x="315" y={(20 + (1 - 0.041) * 190 - 5).toFixed(1)} textAnchor="end" className="text-[9px] font-mono fill-[#A33B20] font-semibold">
+                  <line x1="40" y1={(20 + (1 - 0.041) * 190).toFixed(1)} x2="320" y2={(20 + (1 - 0.041) * 190).toFixed(1)} stroke="#71717A" strokeWidth="1.2" strokeDasharray="3 3" />
+                  <text x="315" y={(20 + (1 - 0.041) * 190 - 5).toFixed(1)} textAnchor="end" className="text-[9px] font-mono fill-[#71717A] font-semibold">
                     Prevalence 4.10%
                   </text>
 
@@ -307,8 +307,8 @@ export default function HeroResearchSummary() {
                   <path
                     d={activePrPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(40 + p.recall * 280).toFixed(1)} ${(20 + (1 - p.kagglePrecision) * 190).toFixed(1)}`).join(' ')}
                     fill="none"
-                    stroke="#1B5E54"
-                    strokeWidth="2.4"
+                    stroke="#1565C0"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                   />
 
@@ -316,8 +316,8 @@ export default function HeroResearchSummary() {
                   <path
                     d={activePrPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(40 + p.recall * 280).toFixed(1)} ${(20 + (1 - p.nhanesPrecision) * 190).toFixed(1)}`).join(' ')}
                     fill="none"
-                    stroke="#A33B20"
-                    strokeWidth="2.4"
+                    stroke="#B71C1C"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                   />
 
@@ -340,12 +340,12 @@ export default function HeroResearchSummary() {
             <div className="flex items-center justify-between pt-3 mt-1 border-t border-[#E2E0D8] text-xs font-mono">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-0.5 bg-[#1B5E54]" />
+                  <span className={`w-2.5 h-0.5 ${activeTab === 'pr' ? 'bg-[#1565C0]' : 'bg-[#1B5E54]'}`} />
                   <span className="text-[#111816]">Kaggle in-domain</span>
                   <span className="text-[#55635E]">({activeTab === 'roc' ? modelScores[selectedHeroModel].inRoc : modelScores[selectedHeroModel].inPr})</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-0.5 bg-[#A33B20]" />
+                  <span className={`w-2.5 h-0.5 ${activeTab === 'pr' ? 'bg-[#B71C1C]' : 'bg-[#A33B20]'}`} />
                   <span className="text-[#111816]">NHANES external</span>
                   <span className="text-[#A33B20]">({activeTab === 'roc' ? modelScores[selectedHeroModel].exRoc : modelScores[selectedHeroModel].exPr})</span>
                 </div>
