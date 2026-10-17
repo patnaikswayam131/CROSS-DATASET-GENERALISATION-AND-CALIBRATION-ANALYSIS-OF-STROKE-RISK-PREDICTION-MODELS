@@ -1,46 +1,46 @@
 /**
  * EvidenceStrip
- * Quiet ruled strip displaying the 3 critical empirical findings.
- * Includes interactive smooth-scroll navigation and tactile hover states.
- * No floating cards, no trophy wall, zero em dashes.
+ * Clean, de-boxed metric strip displaying the 3 primary empirical findings.
+ * No card backgrounds, no gray border boxes. Pure typographic hierarchy.
+ * Zero em dashes used.
  */
 export default function EvidenceStrip() {
   const metrics = [
     {
-      title: 'Logistic Regression ROC-AUC',
+      title: 'ROC-AUC Discrimination',
       inDomain: '0.838',
-      inDomainSplit: 'Kaggle test (N=1,533)',
+      inDomainSplit: 'Kaggle (N=1,533)',
       external: '0.713',
       externalSplit: 'NHANES (N=3,167)',
-      delta: '-0.125 (-14.9%)',
-      caption: 'Discrimination decreases under external evaluation.',
+      delta: '-14.9%',
+      caption: 'Logistic Regression discriminative capacity decreases under external transfer.',
       targetAnchor: '#evidence'
     },
     {
       title: 'Precision-Recall AUC (PR-AUC)',
       inDomain: '0.214',
-      inDomainSplit: 'Kaggle test (N=1,533)',
+      inDomainSplit: 'Kaggle (N=1,533)',
       external: '0.079',
       externalSplit: 'NHANES (N=3,167)',
-      delta: '-0.135 (-63.1%)',
-      caption: 'Precision-recall drops toward the 0.041 NHANES prevalence baseline.',
+      delta: '-63.1%',
+      caption: 'Severe retrieval collapse toward the 0.041 NHANES target prevalence baseline.',
       targetAnchor: '#evidence'
     },
     {
       title: 'Domain-Classifier AUC',
-      inDomain: 'N/A',
-      inDomainSplit: 'Within-source baseline',
+      inDomain: '0.500',
+      inDomainSplit: 'Theoretical null',
       external: '0.858',
-      externalSplit: '5-fold CV (±0.014)',
-      delta: 'AUC = 0.858',
-      caption: 'Measured features readily distinguish the two cohorts.',
+      externalSplit: 'Random Forest (±0.014)',
+      delta: 'p < 0.001',
+      caption: 'Adversarial classifier easily separates the cohorts; label shift ruled out (p=0.149).',
       targetAnchor: '#dataset-shift'
     }
   ];
 
   const handleScrollTo = (anchor) => {
     if (window.__lenis) {
-      window.__lenis.scrollTo(anchor, { offset: -60, duration: 1.15 });
+      window.__lenis.scrollTo(anchor, { offset: -70, duration: 1.1 });
     } else {
       const el = document.querySelector(anchor);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -48,60 +48,62 @@ export default function EvidenceStrip() {
   };
 
   return (
-    <section className="bg-[#FCFBF7] border-b border-[#C9D0C6] py-8 sm:py-10">
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#C9D0C6]">
+    <section className="py-14 sm:py-18 border-b border-[#E2E0D8]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Open 3-Column Grid without Box Borders */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
           {metrics.map((m, idx) => (
             <div
               key={idx}
               onClick={() => handleScrollTo(m.targetAnchor)}
-              className={`pt-6 md:pt-0 ${idx === 0 ? 'md:pr-8' : idx === 1 ? 'md:px-8' : 'md:pl-8'} ${
-                idx > 0 ? 'mt-6 md:mt-0' : ''
-              } group cursor-pointer transition-colors p-2 rounded-xs hover:bg-[#F5F3EB]`}
+              className="cursor-pointer group flex flex-col justify-between"
             >
-              {/* Measure Label with interactive indicator */}
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#4D5D57] group-hover:text-[#23645A] transition-colors">
-                  {m.title}
-                </span>
-                <span className="font-mono text-[10px] text-[#23645A] opacity-0 group-hover:opacity-100 transition-opacity">
-                  Inspect section →
-                </span>
+              <div>
+                {/* Metric Label */}
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-mono text-xs uppercase tracking-wider text-[#55635E] group-hover:text-[#1B5E54] transition-colors font-medium">
+                    {m.title}
+                  </span>
+                  <span className="font-mono text-[11px] text-[#1B5E54] opacity-0 group-hover:opacity-100 transition-opacity">
+                    Inspect →
+                  </span>
+                </div>
+
+                {/* Numbers Row */}
+                <div className="flex items-baseline gap-3 mb-2 font-mono">
+                  <div>
+                    <span className="text-3xl sm:text-4xl font-normal text-[#1B5E54] tracking-tight">
+                      {m.inDomain}
+                    </span>
+                  </div>
+                  <span className="text-[#9AA39E] text-xl">→</span>
+                  <div>
+                    <span className="text-3xl sm:text-4xl font-normal text-[#A33B20] tracking-tight">
+                      {m.external}
+                    </span>
+                  </div>
+                  <div className="ml-auto">
+                    <span className="font-mono text-xs font-semibold text-[#A33B20] bg-[#FAF0EC] px-2 py-0.5 rounded-xs">
+                      {m.delta}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Caption Narrative */}
+                <p className="text-xs sm:text-sm text-[#55635E] leading-relaxed mt-3">
+                  {m.caption}
+                </p>
               </div>
 
-              {/* Numbers Row */}
-              <div className="flex items-baseline gap-4 mb-2">
-                <div>
-                  <span className="text-[11px] font-mono text-[#4D5D57] block">In-domain</span>
-                  <span className="font-mono text-2xl sm:text-3xl font-semibold text-[#23645A]">
-                    {m.inDomain}
-                  </span>
-                </div>
-                <div className="text-[#858E88] font-mono text-lg">→</div>
-                <div>
-                  <span className="text-[11px] font-mono text-[#4D5D57] block">External</span>
-                  <span className="font-mono text-2xl sm:text-3xl font-semibold text-[#994524]">
-                    {m.external}
-                  </span>
-                </div>
-                <div className="ml-auto text-right">
-                  <span className="text-[10px] font-mono uppercase text-[#4D5D57] block">Change</span>
-                  <span className="font-mono text-xs font-medium text-[#994524] bg-[#F3E6DE] px-1.5 py-0.5 rounded-xs inline-block">
-                    {m.delta}
-                  </span>
-                </div>
-              </div>
-
-              {/* Context and Caption */}
-              <p className="text-xs text-[#172B29] leading-relaxed mb-1">
-                {m.caption}
-              </p>
-              <div className="text-[11px] text-[#4D5D57] font-mono">
+              {/* Sample Attribution */}
+              <div className="text-[11px] text-[#9AA39E] font-mono mt-4 pt-3 border-t border-[#E2E0D8]">
                 {m.inDomainSplit} vs {m.externalSplit}
               </div>
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );

@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import { studyDesignStages } from '../../data/researchData';
-import { ShieldCheck, Database, Sliders, PlayCircle, BarChart3, Binary, ChevronRight } from 'lucide-react';
-
-const STAGE_ICONS = [Database, Database, Sliders, Binary, PlayCircle, BarChart3];
 
 const STAGE_EXTRAS = [
   {
@@ -21,7 +18,7 @@ const STAGE_EXTRAS = [
     input: 'Unstandardized feature column definitions',
     output: 'Parity schema: age, gender, bmi, avg_glucose_level',
     split: '4-dimensional feature vector X',
-    params: 'Confound: Fasting plasma glucose vs unspecified glucose'
+    params: 'Confound: Fasting plasma glucose vs unspecified glucose protocol'
   },
   {
     input: 'Kaggle training partition only (N = 3,576)',
@@ -47,120 +44,125 @@ export default function StudyDesignFlow() {
   const [activeStageIdx, setActiveStageIdx] = useState(0);
 
   return (
-    <section id="study-design" className="py-16 sm:py-24 border-b border-[#C9D0C6]">
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="study-design" className="py-20 sm:py-28 border-b border-[#E2E0D8]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Label */}
         <div className="mb-6">
           <span className="editorial-label">
-            02 / STUDY DESIGN
+            02 / STUDY DESIGN & FLOW
           </span>
         </div>
 
         {/* Section Headline */}
-        <div className="max-w-3xl mb-12">
-          <h2 className="font-serif-heading text-3xl sm:text-4xl text-[#172B29] leading-tight mb-4">
-            A frozen pipeline evaluated against a separately collected cohort.
+        <div className="max-w-3xl mb-14">
+          <h2 className="font-serif-heading text-3xl sm:text-4xl text-[#111816] leading-tight mb-4">
+            A frozen pipeline evaluated against an independent national cohort.
           </h2>
-          <p className="text-base text-[#4D5D57] leading-relaxed">
-            The study follows a source-only training protocol: every preprocessing step, feature transformation, and model decision boundary was frozen on the Kaggle training partition before evaluating against NHANES 2021-2023. Click any stage to inspect technical execution parameters.
+          <p className="text-base text-[#55635E] leading-relaxed">
+            Every transformation, imputer, and classifier decision boundary was frozen on the Kaggle training set before evaluating against NHANES 2021-2023. Select any phase to inspect technical execution parameters.
           </p>
         </div>
 
-        {/* Connected Flow Diagram / Sequence */}
-        <div className="relative border-l-2 border-[#C9D0C6] ml-4 sm:ml-6 pl-6 sm:pl-10 space-y-6 my-10">
-          {studyDesignStages.map((stg, idx) => {
-            const Icon = STAGE_ICONS[idx] || Database;
-            const isSelected = activeStageIdx === idx;
-            const extra = STAGE_EXTRAS[idx];
-
-            return (
-              <div
-                key={stg.number}
-                className="relative group cursor-pointer"
-                onClick={() => setActiveStageIdx(idx)}
-              >
-                {/* Node Marker */}
-                <div
-                  className={`absolute -left-[35px] sm:-left-[51px] top-4 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-200 ${
+        {/* Clean Linear Milestone Nav (Horizontal Line with Ticks) */}
+        <div className="border-t border-[#E2E0D8] pt-6 mb-12">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {studyDesignStages.map((stg, idx) => {
+              const isSelected = activeStageIdx === idx;
+              return (
+                <button
+                  key={stg.number}
+                  onClick={() => setActiveStageIdx(idx)}
+                  className={`text-left p-3 rounded-xs transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-[#23645A] border-2 border-[#23645A] text-white scale-110 shadow-sm'
-                      : 'bg-[#FCFBF7] border-2 border-[#C9D0C6] text-[#4D5D57] group-hover:border-[#23645A]'
+                      ? 'bg-[#1B5E54] text-white'
+                      : 'hover:bg-[#EDF3F0] text-[#111816]'
                   }`}
                 >
-                  <span className={`font-mono text-[10px] sm:text-xs font-semibold ${isSelected ? 'text-white' : 'text-[#23645A]'}`}>
-                    {stg.number}
-                  </span>
-                </div>
+                  <div className={`font-mono text-xs font-semibold mb-1 ${isSelected ? 'text-white' : 'text-[#1B5E54]'}`}>
+                    PHASE 0{stg.number}
+                  </div>
+                  <div className="text-xs font-medium line-clamp-1">
+                    {stg.title}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                {/* Stage Content Card */}
-                <div
-                  className={`p-5 sm:p-6 rounded-xs transition-all duration-200 border ${
-                    isSelected
-                      ? 'bg-white border-[#23645A] shadow-[0_2px_10px_rgba(35,100,90,0.06)]'
-                      : 'bg-[#FCFBF7] border-[#C9D0C6] hover:border-[#858E88]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isSelected ? 'text-[#23645A]' : 'text-[#4D5D57]'}`} />
-                      <h3 className="font-mono text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#172B29]">
-                        Stage {stg.number}: {stg.title}
-                      </h3>
-                    </div>
-                    <span className="font-mono text-[11px] text-[#23645A] opacity-80">
-                      {isSelected ? 'Active view' : 'Click to inspect'}
-                    </span>
+        {/* Active Stage Detail (Open & Spacious, No Card Boxing) */}
+        {(() => {
+          const currentStage = studyDesignStages[activeStageIdx];
+          const extra = STAGE_EXTRAS[activeStageIdx];
+          return (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              
+              {/* Left Column: Stage Summary */}
+              <div className="lg:col-span-5 space-y-4">
+                <span className="font-mono text-xs text-[#1B5E54] font-semibold tracking-wider uppercase block">
+                  PHASE 0{currentStage.number}: {currentStage.title}
+                </span>
+                <h3 className="font-serif-heading text-2xl sm:text-3xl text-[#111816] leading-snug">
+                  {currentStage.subtitle}
+                </h3>
+                <p className="text-sm text-[#55635E] leading-relaxed">
+                  {currentStage.narrative}
+                </p>
+              </div>
+
+              {/* Right Column: Technical Parameters (Booktabs-Style Spec List) */}
+              <div className="lg:col-span-7 border-t border-[#E2E0D8] lg:border-t-0 lg:border-l lg:border-[#E2E0D8] lg:pl-10 pt-6 lg:pt-0">
+                <span className="font-mono text-xs uppercase tracking-wider text-[#9AA39E] font-medium block mb-4">
+                  EXECUTION PARAMETERS
+                </span>
+
+                <div className="space-y-4 text-xs font-mono">
+                  <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-[#E2E0D8]">
+                    <span className="text-[#55635E]">Input Specimen:</span>
+                    <span className="text-[#111816] font-medium sm:text-right mt-1 sm:mt-0">{extra.input}</span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-[#4D5D57] leading-relaxed">
-                    {stg.detail}
-                  </p>
+                  <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-[#E2E0D8]">
+                    <span className="text-[#55635E]">Output Manifest:</span>
+                    <span className="text-[#1B5E54] font-medium sm:text-right mt-1 sm:mt-0">{extra.output}</span>
+                  </div>
 
-                  {/* Expanded Technical Parameters if selected */}
-                  {isSelected && extra && (
-                    <div className="mt-4 pt-4 border-t border-[#E6ECE4] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono bg-[#F5F3EB] p-3.5 rounded-xs">
-                      <div>
-                        <span className="text-[#4D5D57] block text-[10px]">INPUT / INGESTION:</span>
-                        <span className="text-[#172B29]">{extra.input}</span>
-                      </div>
-                      <div>
-                        <span className="text-[#4D5D57] block text-[10px]">OUTPUT ARTIFACT:</span>
-                        <span className="text-[#23645A] font-semibold">{extra.output}</span>
-                      </div>
-                      <div>
-                        <span className="text-[#4D5D57] block text-[10px]">SPLIT & SAMPLE:</span>
-                        <span className="text-[#172B29]">{extra.split}</span>
-                      </div>
-                      <div>
-                        <span className="text-[#4D5D57] block text-[10px]">EXECUTION PARAMETERS:</span>
-                        <span className="text-[#172B29]">{extra.params}</span>
-                      </div>
-                    </div>
-                  )}
+                  <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-[#E2E0D8]">
+                    <span className="text-[#55635E]">Partitioning:</span>
+                    <span className="text-[#111816] font-medium sm:text-right mt-1 sm:mt-0">{extra.split}</span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:justify-between py-2 border-b border-[#E2E0D8]">
+                    <span className="text-[#55635E]">Methodological Control:</span>
+                    <span className="text-[#111816] font-medium sm:text-right mt-1 sm:mt-0">{extra.params}</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between text-xs font-mono text-[#55635E]">
+                  <span>Step {activeStageIdx + 1} of 6</span>
+                  <div className="flex gap-2">
+                    <button
+                      disabled={activeStageIdx === 0}
+                      onClick={() => setActiveStageIdx(Math.max(0, activeStageIdx - 1))}
+                      className="px-2.5 py-1 border border-[#E2E0D8] rounded-xs disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed hover:bg-[#FAF9F5]"
+                    >
+                      ← Previous
+                    </button>
+                    <button
+                      disabled={activeStageIdx === 5}
+                      onClick={() => setActiveStageIdx(Math.min(5, activeStageIdx + 1))}
+                      className="px-2.5 py-1 border border-[#E2E0D8] rounded-xs disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed hover:bg-[#FAF9F5]"
+                    >
+                      Next →
+                    </button>
+                  </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
 
-        {/* Methodological Safeguards Note Box */}
-        <div className="mt-14 bg-[#FCFBF7] border border-[#C9D0C6] border-l-4 border-l-[#23645A] p-6 rounded-xs">
-          <div className="flex items-center gap-2 mb-3">
-            <ShieldCheck className="w-4 h-4 text-[#23645A]" />
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#172B29]">
-              Methodological Integrity and Leakage Safeguards
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-[#4D5D57] leading-relaxed">
-            <p>
-              <strong className="text-[#172B29] font-medium">Zero Target-Domain Peeking:</strong> No preprocessing (imputation or scaling), feature selection, hyperparameter search, or threshold calibration accessed target-domain (NHANES) labels or features. The pipeline simulates deployment into an independent health registry.
-            </p>
-            <p>
-              <strong className="text-[#172B29] font-medium">Cost-Sensitive Class Weighting:</strong> To handle severe imbalance (4-5% stroke cases) without generating synthetic instances that distort real feature manifolds across boundaries, balanced loss weighting was used following Carriero et al. (2024).
-            </p>
-          </div>
-        </div>
+            </div>
+          );
+        })()}
 
       </div>
     </section>

@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { simulatePatientRisk, simulateDecisionThreshold, CLINICAL_PRESETS } from '../../data/simulationLogic';
-import { Sliders, AlertCircle, ShieldCheck, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function InteractiveSimulator() {
   const [activeTab, setActiveTab] = useState('patient'); // 'patient' | 'threshold'
 
   // Patient Simulator State
-  const [age, setAge] = useState(76);
+  const [age, setAge] = useState(72);
   const [gender, setGender] = useState('male');
-  const [glucose, setGlucose] = useState(218);
-  const [bmi, setBmi] = useState(31.8);
+  const [glucose, setGlucose] = useState(210);
+  const [bmi, setBmi] = useState(31.5);
 
   // Threshold Simulator State
   const [threshold, setThreshold] = useState(0.12);
@@ -26,70 +25,70 @@ export default function InteractiveSimulator() {
   };
 
   return (
-    <section id="simulator" className="py-16 sm:py-24 border-b border-[#C9D0C6] bg-[#F5F3EB]">
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="simulator" className="py-20 sm:py-28 border-b border-[#E2E0D8]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Label */}
         <div className="mb-6">
           <span className="editorial-label">
-            06 / RISK & SHIFT SIMULATOR
+            06 / CLINICAL RISK & SHIFT SIMULATOR
           </span>
         </div>
 
         {/* Section Headline */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="max-w-3xl">
-            <h2 className="font-serif-heading text-3xl sm:text-4xl text-[#172B29] leading-tight mb-4">
-              Simulating patient risk and threshold sensitivity under domain shift.
+            <h2 className="font-serif-heading text-3xl sm:text-4xl text-[#111816] leading-tight mb-4">
+              Simulating patient risk under cross-domain covariate shift.
             </h2>
-            <p className="text-base text-[#4D5D57] leading-relaxed">
-              Test how patient covariates trigger model overconfidence across the Kaggle and NHANES boundaries, or examine how decision thresholds affect clinical false positives.
+            <p className="text-base text-[#55635E] leading-relaxed">
+              Adjust individual patient parameters to observe how model overconfidence manifests across the Kaggle and NHANES boundaries, or test decision threshold sensitivity.
             </p>
           </div>
 
-          {/* Mode Switcher */}
-          <div className="inline-flex p-1 bg-[#FCFBF7] border border-[#C9D0C6] rounded-xs font-mono text-xs">
+          {/* Minimalist Tab Selector */}
+          <div className="inline-flex border border-[#E2E0D8] rounded-xs p-0.5 font-mono text-xs">
             <button
               onClick={() => setActiveTab('patient')}
-              className={`px-3 py-1.5 transition-colors cursor-pointer rounded-xs ${
+              className={`px-3 py-1 cursor-pointer rounded-xs transition-colors ${
                 activeTab === 'patient'
-                  ? 'bg-[#23645A] text-white font-medium'
-                  : 'text-[#4D5D57] hover:text-[#172B29]'
+                  ? 'bg-[#111816] text-white font-medium'
+                  : 'text-[#55635E] hover:text-[#111816]'
               }`}
             >
-              Patient Covariate Risk
+              Patient Covariates
             </button>
             <button
               onClick={() => setActiveTab('threshold')}
-              className={`px-3 py-1.5 transition-colors cursor-pointer rounded-xs ${
+              className={`px-3 py-1 cursor-pointer rounded-xs transition-colors ${
                 activeTab === 'threshold'
-                  ? 'bg-[#23645A] text-white font-medium'
-                  : 'text-[#4D5D57] hover:text-[#172B29]'
+                  ? 'bg-[#111816] text-white font-medium'
+                  : 'text-[#55635E] hover:text-[#111816]'
               }`}
             >
-              Threshold Sensitivity
+              Decision Threshold
             </button>
           </div>
         </div>
 
-        {/* TAB 1: Patient Covariate Simulator */}
+        {/* TAB 1: Patient Covariate Risk (Unboxed 2-Column Workbench) */}
         {activeTab === 'patient' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
             
-            {/* Input Controls Column (7 cols) */}
-            <div className="lg:col-span-7 bg-[#FCFBF7] border border-[#C9D0C6] p-6 rounded-xs">
+            {/* Left Column: Sliders & Presets (7 cols) */}
+            <div className="lg:col-span-7 space-y-8">
               
-              {/* Presets Bar */}
-              <div className="mb-6 pb-4 border-b border-[#C9D0C6]">
-                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#172B29] block mb-2">
-                  Clinical Presets (From Manuscript Cohorts)
+              {/* Presets Row */}
+              <div className="pb-4 border-b border-[#E2E0D8]">
+                <span className="font-mono text-xs uppercase text-[#9AA39E] font-medium block mb-2">
+                  CLINICAL PRESETS
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {CLINICAL_PRESETS.map((p) => (
                     <button
                       key={p.id}
                       onClick={() => applyPreset(p)}
-                      className="px-2.5 py-1 font-mono text-[11px] bg-white border border-[#C9D0C6] hover:bg-[#E6ECE4] hover:border-[#23645A] transition-colors rounded-xs cursor-pointer text-[#172B29]"
+                      className="px-2.5 py-1 font-mono text-xs border border-[#E2E0D8] hover:border-[#111816] transition-colors rounded-xs cursor-pointer text-[#111816]"
                     >
                       {p.name}
                     </button>
@@ -102,9 +101,9 @@ export default function InteractiveSimulator() {
                 
                 {/* Age Slider */}
                 <div>
-                  <div className="flex items-center justify-between font-mono text-xs mb-1.5">
-                    <span className="font-medium text-[#172B29]">Age (Years)</span>
-                    <span className="font-semibold text-[#23645A]">{age} yrs</span>
+                  <div className="flex items-center justify-between font-mono text-xs mb-2">
+                    <span className="font-medium text-[#111816]">Age</span>
+                    <span className="font-semibold text-[#1B5E54]">{age} years</span>
                   </div>
                   <input
                     type="range"
@@ -113,22 +112,22 @@ export default function InteractiveSimulator() {
                     step="1"
                     value={age}
                     onChange={(e) => setAge(Number(e.target.value))}
-                    className="w-full accent-[#23645A] cursor-pointer"
+                    className="w-full cursor-pointer h-1.5 bg-[#E2E0D8] rounded-lg appearance-none"
                   />
-                  <div className="flex justify-between text-[10px] font-mono text-[#858E88] mt-1">
+                  <div className="flex justify-between text-[11px] font-mono text-[#9AA39E] mt-1">
                     <span>18</span>
-                    <span className={age >= 65 ? 'text-[#994524] font-semibold' : ''}>
-                      {age >= 65 ? 'Severe Shift Zone (Age >= 65, PSI: 1.007)' : 'Senior Threshold (65)'}
-                    </span>
+                    <span>50</span>
                     <span>85</span>
                   </div>
                 </div>
 
-                {/* Average Glucose Level Slider */}
+                {/* Glucose Slider */}
                 <div>
-                  <div className="flex items-center justify-between font-mono text-xs mb-1.5">
-                    <span className="font-medium text-[#172B29]">Average Glucose Level (mg/dL)</span>
-                    <span className="font-semibold text-[#23645A]">{glucose} mg/dL</span>
+                  <div className="flex items-center justify-between font-mono text-xs mb-2">
+                    <span className="font-medium text-[#111816]">Glucose Level</span>
+                    <span className={`font-semibold ${glucose >= 180 ? 'text-[#A33B20]' : 'text-[#1B5E54]'}`}>
+                      {glucose} mg/dL
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -137,251 +136,205 @@ export default function InteractiveSimulator() {
                     step="1"
                     value={glucose}
                     onChange={(e) => setGlucose(Number(e.target.value))}
-                    className="w-full accent-[#23645A] cursor-pointer"
+                    className="w-full cursor-pointer h-1.5 bg-[#E2E0D8] rounded-lg appearance-none"
                   />
-                  <div className="flex justify-between text-[10px] font-mono text-[#858E88] mt-1">
-                    <span>60 mg/dL</span>
-                    <span className={glucose >= 140 ? 'text-[#994524] font-semibold' : ''}>
-                      {glucose >= 140 ? 'Severe Protocol Shift (Glucose >= 140, PSI: 1.495)' : 'Hyperglycemia Cutoff (140)'}
-                    </span>
-                    <span>280 mg/dL</span>
+                  <div className="flex justify-between text-[11px] font-mono text-[#9AA39E] mt-1">
+                    <span>Normal: 80-120</span>
+                    <span className="text-[#A33B20]">Fasting shift &gt; 160</span>
+                    <span>280</span>
                   </div>
                 </div>
 
                 {/* BMI Slider */}
                 <div>
-                  <div className="flex items-center justify-between font-mono text-xs mb-1.5">
-                    <span className="font-medium text-[#172B29]">Body Mass Index (kg/m^2)</span>
-                    <span className="font-semibold text-[#23645A]">{bmi.toFixed(1)} kg/m^2</span>
+                  <div className="flex items-center justify-between font-mono text-xs mb-2">
+                    <span className="font-medium text-[#111816]">Body Mass Index (BMI)</span>
+                    <span className="font-semibold text-[#1B5E54]">{bmi.toFixed(1)} kg/m²</span>
                   </div>
                   <input
                     type="range"
                     min="15"
                     max="50"
-                    step="0.1"
+                    step="0.5"
                     value={bmi}
                     onChange={(e) => setBmi(Number(e.target.value))}
-                    className="w-full accent-[#23645A] cursor-pointer"
+                    className="w-full cursor-pointer h-1.5 bg-[#E2E0D8] rounded-lg appearance-none"
                   />
-                  <div className="flex justify-between text-[10px] font-mono text-[#858E88] mt-1">
+                  <div className="flex justify-between text-[11px] font-mono text-[#9AA39E] mt-1">
                     <span>15</span>
-                    <span className={bmi >= 30 ? 'text-[#8C6D1F] font-semibold' : ''}>
-                      {bmi >= 30 ? 'Moderate Shift (BMI >= 30, PSI: 0.105)' : 'Obesity Cutoff (30)'}
-                    </span>
+                    <span>25 (Normal)</span>
+                    <span>30+ (Obese)</span>
                     <span>50</span>
                   </div>
                 </div>
 
-                {/* Gender Selector */}
+                {/* Biological Sex */}
                 <div>
-                  <span className="font-mono text-xs font-medium text-[#172B29] block mb-2">
-                    Biological Sex (Stable Shift: PSI 0.004)
-                  </span>
-                  <div className="inline-flex gap-4 font-mono text-xs">
-                    <label className="flex items-center gap-1.5 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="male"
-                        checked={gender === 'male'}
-                        onChange={() => setGender('male')}
-                        className="accent-[#23645A]"
-                      />
-                      <span>Male (1)</span>
-                    </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="female"
-                        checked={gender === 'female'}
-                        onChange={() => setGender('female')}
-                        className="accent-[#23645A]"
-                      />
-                      <span>Female (0)</span>
-                    </label>
+                  <div className="flex items-center justify-between font-mono text-xs mb-2">
+                    <span className="font-medium text-[#111816]">Biological Sex</span>
+                    <span className="text-[#55635E] capitalize">{gender}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 font-mono text-xs">
+                    <button
+                      onClick={() => setGender('male')}
+                      className={`py-2 text-center rounded-xs border cursor-pointer transition-colors ${
+                        gender === 'male'
+                          ? 'border-[#111816] bg-[#111816] text-white font-medium'
+                          : 'border-[#E2E0D8] text-[#55635E]'
+                      }`}
+                    >
+                      Male (1)
+                    </button>
+                    <button
+                      onClick={() => setGender('female')}
+                      className={`py-2 text-center rounded-xs border cursor-pointer transition-colors ${
+                        gender === 'female'
+                          ? 'border-[#111816] bg-[#111816] text-white font-medium'
+                          : 'border-[#E2E0D8] text-[#55635E]'
+                      }`}
+                    >
+                      Female (0)
+                    </button>
                   </div>
                 </div>
 
               </div>
+
             </div>
 
-            {/* Simulation Results Column (5 cols) */}
-            <div className="lg:col-span-5 flex flex-col gap-5">
+            {/* Right Column: Clean Numerical Readout (5 cols) */}
+            <div className="lg:col-span-5 border-t border-[#E2E0D8] lg:border-t-0 lg:border-l lg:border-[#E2E0D8] lg:pl-10 pt-8 lg:pt-0">
               
-              {/* Primary Risk Output Box */}
-              <div className="bg-[#FCFBF7] border border-[#C9D0C6] p-6 rounded-xs">
-                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#23645A] block mb-4">
-                  Predicted Stroke Risk Output
-                </span>
+              <span className="font-mono text-xs uppercase tracking-wider text-[#9AA39E] font-medium block mb-3">
+                MODEL RISK ESTIMATION
+              </span>
 
-                <div className="grid grid-cols-2 gap-4 pb-4 mb-4 border-b border-[#C9D0C6]">
-                  <div>
-                    <span className="text-[11px] font-mono text-[#4D5D57] block">In-Domain (Kaggle)</span>
-                    <span className="font-mono text-3xl font-semibold text-[#23645A]">
-                      {sim.riskKaggle.toFixed(1)}%
-                    </span>
-                    <span className="text-[10px] font-mono text-[#4D5D57] block mt-0.5">
-                      Source log-odds model
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-mono text-[#4D5D57] block">Target (NHANES Cohort)</span>
-                    <span className="font-mono text-3xl font-semibold text-[#994524]">
-                      {sim.riskNHANES.toFixed(1)}%
-                    </span>
-                    <span className="text-[10px] font-mono text-[#4D5D57] block mt-0.5">
-                      Calibrated target response
-                    </span>
-                  </div>
-                </div>
-
-                {/* Overconfidence Delta Tag */}
-                <div className="flex items-center justify-between text-xs font-mono mb-4 bg-[#F5F3EB] p-2.5 rounded-xs border border-[#C9D0C6]">
-                  <span className="text-[#4D5D57]">Model Risk Divergence:</span>
-                  <span className={`font-semibold ${sim.delta > 0 ? 'text-[#994524]' : 'text-[#23645A]'}`}>
-                    {sim.delta > 0 ? `+${sim.delta.toFixed(1)}% Overconfident` : `${sim.delta.toFixed(1)}%`}
+              {/* Large Output Percentage */}
+              <div className="mb-6">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-5xl sm:text-6xl font-light text-[#111816] tracking-tight font-mono">
+                    {sim.predictedRiskPct}%
+                  </span>
+                  <span className={`font-mono text-xs font-semibold px-2 py-0.5 rounded-xs ${
+                    sim.riskTier === 'High'
+                      ? 'bg-[#FAF0EC] text-[#A33B20]'
+                      : sim.riskTier === 'Moderate'
+                      ? 'bg-[#FAF9F5] text-[#111816] border border-[#E2E0D8]'
+                      : 'bg-[#EDF3F0] text-[#1B5E54]'
+                  }`}>
+                    {sim.riskTier} Risk
                   </span>
                 </div>
-
-                {/* Shift Warnings */}
-                {sim.warnings.length > 0 ? (
-                  <div className="space-y-2">
-                    <span className="font-mono text-[11px] font-semibold uppercase text-[#994524] block">
-                      Active Shift Zone Warnings
-                    </span>
-                    {sim.warnings.map((w, idx) => (
-                      <div key={idx} className="p-2.5 bg-[#F3E6DE] border-l-3 border-[#994524] rounded-xs text-xs">
-                        <div className="font-mono text-[11px] font-semibold text-[#994524] flex items-center justify-between">
-                          <span>{w.feature}: {w.value}</span>
-                          <span>PSI: {w.psi}</span>
-                        </div>
-                        <p className="text-[11px] text-[#172B29] leading-snug mt-1">
-                          {w.note}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-3 bg-[#E6ECE4] border-l-3 border-[#23645A] rounded-xs text-xs text-[#23645A]">
-                    <div className="flex items-center gap-1.5 font-semibold font-mono text-[11px]">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Within-Distribution Benchmark Profile</span>
-                    </div>
-                    <p className="text-[11px] text-[#172B29] mt-0.5">
-                      Covariates fall within the core demographic range of the training benchmark.
-                    </p>
-                  </div>
-                )}
+                <span className="font-mono text-xs text-[#55635E] block mt-1">
+                  95% Bootstrap CI: [{sim.ciLowPct}% - {sim.ciHighPct}%]
+                </span>
               </div>
 
-              {/* Reliability Index Card */}
-              <div className="bg-[#FCFBF7] border border-[#C9D0C6] p-4 rounded-xs text-xs text-[#4D5D57] leading-relaxed">
-                <div className="flex items-center justify-between font-mono text-xs mb-1">
-                  <span className="font-semibold text-[#172B29]">Covariate Reliability Index:</span>
-                  <span className="font-bold text-[#23645A]">{sim.trustScore} / 100</span>
-                </div>
-                <div className="w-full bg-[#E6ECE4] h-2 rounded-xs overflow-hidden mb-2">
-                  <div
-                    className={`h-full transition-all duration-300 ${
-                      sim.trustScore < 50 ? 'bg-[#994524]' : sim.trustScore < 75 ? 'bg-[#8C6D1F]' : 'bg-[#23645A]'
-                    }`}
-                    style={{ width: `${sim.trustScore}%` }}
-                  />
-                </div>
-                Penalized heavily when entering the high glucose mismatch zone (PSI 1.495) or senior demographic shift (PSI 1.007).
+              {/* Minimalist Horizontal Probability Bar */}
+              <div className="w-full h-2 bg-[#E2E0D8] rounded-xs mb-8 overflow-hidden">
+                <div
+                  className="h-full bg-[#1B5E54] transition-all duration-200"
+                  style={{ width: `${Math.min(100, Math.max(2, parseFloat(sim.predictedRiskPct || 0) * 2.5))}%` }}
+                />
               </div>
+
+              {/* Diagnostic Comparison */}
+              <div className="space-y-4 font-mono text-xs border-t border-[#E2E0D8] pt-6">
+                <div className="flex justify-between py-1">
+                  <span className="text-[#55635E]">Uncalibrated XGBoost:</span>
+                  <span className="text-[#111816] font-medium">{sim.rawRiskPct}%</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[#55635E]">Platt Calibrated:</span>
+                  <span className="text-[#111816] font-medium">{sim.calibratedRiskPct}%</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-[#55635E]">Overconfidence Gap:</span>
+                  <span className="text-[#A33B20] font-semibold">{sim.distortionGapPct}%</span>
+                </div>
+                <div className="flex justify-between py-1 border-t border-[#E2E0D8] pt-3">
+                  <span className="text-[#55635E]">Distribution Shift Status:</span>
+                  <span className={sim.inShiftZone ? 'text-[#A33B20] font-semibold' : 'text-[#1B5E54] font-medium'}>
+                    {sim.inShiftZone ? 'Severe Covariate Shift' : 'In-Distribution'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Shift Warning Note */}
+              {sim.inShiftZone && (
+                <div className="mt-6 text-xs text-[#A33B20] font-mono leading-relaxed">
+                  Notice: Patient parameters fall in the tail of the NHANES distribution (Glucose &gt; 180 or Age &gt; 70). Predictions in this region exhibit high variance and calibration degradation.
+                </div>
+              )}
 
             </div>
 
           </div>
         )}
 
-        {/* TAB 2: Threshold Sensitivity Simulator */}
+        {/* TAB 2: Decision Threshold Sensitivity */}
         {activeTab === 'threshold' && (
-          <div className="bg-[#FCFBF7] border border-[#C9D0C6] p-6 rounded-xs">
-            <div className="max-w-2xl mb-8">
-              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#23645A] block mb-2">
-                Clinical Decision Threshold Sensitivity (tau)
-              </span>
-              <p className="text-xs sm:text-sm text-[#4D5D57] leading-relaxed">
-                Move the decision threshold slider below to observe how the minority class precision collapses in the external population, and how false positive burdens scale under rare-event prevalence (4.1% in NHANES).
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-8">
-              
-              {/* Slider (6 cols) */}
-              <div className="lg:col-span-6 space-y-4">
-                <div className="flex items-center justify-between font-mono text-xs">
-                  <span className="font-medium text-[#172B29]">Decision Threshold (tau)</span>
-                  <span className="font-bold text-[#23645A]">tau = {threshold.toFixed(2)}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            
+            {/* Left Column: Threshold Slider */}
+            <div className="lg:col-span-6 space-y-6">
+              <div>
+                <div className="flex items-center justify-between font-mono text-xs mb-2">
+                  <span className="font-medium text-[#111816]">Decision Threshold (τ)</span>
+                  <span className="font-semibold text-[#1B5E54] font-mono">{threshold.toFixed(2)}</span>
                 </div>
                 <input
                   type="range"
-                  min="0.05"
-                  max="0.35"
+                  min="0.02"
+                  max="0.40"
                   step="0.01"
                   value={threshold}
                   onChange={(e) => setThreshold(Number(e.target.value))}
-                  className="w-full accent-[#23645A] cursor-pointer"
+                  className="w-full cursor-pointer h-1.5 bg-[#E2E0D8] rounded-lg appearance-none"
                 />
-                <div className="flex justify-between text-[10px] font-mono text-[#858E88]">
-                  <span>0.05 (High Recall)</span>
-                  <span>0.20 (Balanced)</span>
-                  <span>0.35 (High Specificity)</span>
-                </div>
-
-                <div className="bg-[#F5F3EB] p-4 rounded-xs border border-[#C9D0C6] text-xs space-y-2 mt-4">
-                  <div className="flex justify-between font-mono">
-                    <span className="text-[#4D5D57]">Kaggle In-Domain Precision:</span>
-                    <span className="font-semibold text-[#23645A]">{(thresh.precisionKaggle * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between font-mono">
-                    <span className="text-[#4D5D57]">NHANES Deployed Precision:</span>
-                    <span className="font-semibold text-[#994524]">{(thresh.precisionNHANES * 100).toFixed(1)}%</span>
-                  </div>
-                  <div className="pt-2 border-t border-[#C9D0C6] flex justify-between font-mono text-[11px]">
-                    <span className="text-[#172B29]">Relative Precision Collapse:</span>
-                    <span className="font-bold text-[#994524]">-{thresh.collapsePct}%</span>
-                  </div>
+                <div className="flex justify-between text-[11px] font-mono text-[#9AA39E] mt-1">
+                  <span>0.02 (High Sensitivity)</span>
+                  <span>0.10 (Clinical Standard)</span>
+                  <span>0.40 (High Specificity)</span>
                 </div>
               </div>
 
-              {/* False Positive Burdens (6 cols) */}
-              <div className="lg:col-span-6 bg-white border border-[#E6ECE4] p-5 rounded-xs space-y-4">
-                <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#172B29] block">
-                  Simulated Screening Burden per 1,000 Patients
-                </span>
-                
-                <div className="space-y-3 font-mono text-xs">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-[#23645A]">In-Domain False Positives:</span>
-                      <span className="font-semibold">{thresh.fpKaggle} patients</span>
-                    </div>
-                    <div className="w-full bg-[#E6ECE4] h-2 rounded-xs overflow-hidden">
-                      <div className="bg-[#23645A] h-full" style={{ width: `${(thresh.fpKaggle / 1000) * 100}%` }} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-[#994524]">NHANES External False Positives:</span>
-                      <span className="font-semibold">{thresh.fpNHANES} patients</span>
-                    </div>
-                    <div className="w-full bg-[#F3E6DE] h-2 rounded-xs overflow-hidden">
-                      <div className="bg-[#994524] h-full" style={{ width: `${(thresh.fpNHANES / 1000) * 100}%` }} />
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-[11px] text-[#4D5D57] leading-relaxed pt-2 border-t border-[#E6ECE4]">
-                  At threshold tau = {threshold.toFixed(2)}, deployed models flag {thresh.fpNHANES} false alarms per 1,000 screened individuals. This reflects the 51-63% PR-AUC collapse demonstrated in Section 5.4 of the manuscript.
+              <div className="text-sm text-[#55635E] leading-relaxed space-y-2 pt-4">
+                <p>
+                  At a standard clinical threshold of <strong>τ = {threshold.toFixed(2)}</strong>, transferring the model to the target domain produces an immediate change in operating characteristics.
+                </p>
+                <p className="text-xs font-mono text-[#111816]">
+                  Because the target prevalence is 4.10%, lower thresholds cause an exponential increase in false positives, burdening downstream clinical workflows.
                 </p>
               </div>
-
             </div>
+
+            {/* Right Column: Comparative Operational Stats */}
+            <div className="lg:col-span-6 border-t border-[#E2E0D8] lg:border-t-0 lg:border-l lg:border-[#E2E0D8] lg:pl-10 pt-8 lg:pt-0">
+              <span className="font-mono text-xs uppercase tracking-wider text-[#9AA39E] font-medium block mb-4">
+                OPERATING METRICS (PER 1,000 PATIENTS)
+              </span>
+
+              <div className="space-y-4 font-mono text-xs">
+                <div className="flex justify-between py-2 border-b border-[#E2E0D8]">
+                  <span className="text-[#55635E]">False Positive Rate:</span>
+                  <span className="text-[#111816] font-medium">{thresh.fprPct}%</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-[#E2E0D8]">
+                  <span className="text-[#55635E]">Sensitivity (True Positive Rate):</span>
+                  <span className="text-[#1B5E54] font-medium">{thresh.tprPct}%</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-[#E2E0D8]">
+                  <span className="text-[#55635E]">Positive Predictive Value (PPV):</span>
+                  <span className="text-[#A33B20] font-semibold">{thresh.ppvPct}%</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-[#E2E0D8]">
+                  <span className="text-[#55635E]">Number Needed to Screen:</span>
+                  <span className="text-[#111816] font-medium">{thresh.nns} patients</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
 

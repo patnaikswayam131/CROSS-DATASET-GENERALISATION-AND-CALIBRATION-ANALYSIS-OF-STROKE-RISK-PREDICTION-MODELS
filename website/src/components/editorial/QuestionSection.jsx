@@ -1,74 +1,56 @@
 /**
  * QuestionSection
  * Section 01 / THE QUESTION
+ * Clean, spacious editorial reading section. De-boxed, airy, and high contrast.
  * Zero em dashes used.
  */
 export default function QuestionSection() {
   return (
-    <section id="question" className="py-16 sm:py-24 border-b border-[#C9D0C6]">
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="question" className="py-20 sm:py-28 border-b border-[#E2E0D8]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Label */}
         <div className="mb-6">
           <span className="editorial-label">
-            01 / THE QUESTION
+            01 / RESEARCH QUESTION
           </span>
         </div>
 
-        {/* Section Grid: Headline and Editorial Prose */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
+        {/* Section Headline */}
+        <h2 className="font-serif-heading text-3xl sm:text-4xl text-[#111816] leading-tight mb-12 max-w-3xl">
+          Does an algorithmic risk score retain clinical validity when tested outside its training distribution?
+        </h2>
+
+        {/* 2-Column Spacious Editorial Text (No Boxes) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 text-base text-[#55635E] leading-relaxed">
           
-          {/* Main Column */}
-          <div className="lg:col-span-8">
-            <h2 className="font-serif-heading text-3xl sm:text-4xl lg:text-[2.65rem] leading-tight text-[#172B29] mb-8">
-              The question is not whether the score is high. It is whether it holds up.
-            </h2>
-
-            <div className="space-y-5 text-base sm:text-lg text-[#172B29] leading-relaxed">
-              <p>
-                Models for stroke-risk prediction are often evaluated on the dataset used to train them. A strong score on that dataset does not establish that the same model will behave similarly when the population, measurements, missingness patterns, or data-collection process changes.
-              </p>
-              <p className="text-[#4D5D57]">
-                This project examines the empirical gap between in-domain evaluation and deployment on a separately collected, harmonised dataset. We test whether three commonly deployed architectures (Logistic Regression, Random Forest, and XGBoost) retain discrimination, precision, and probability calibration when shifted from the Kaggle Stroke Prediction dataset to an independent NHANES 2021-2023 cohort.
-              </p>
-            </div>
-
-            {/* Three Analytical Pillars */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pt-8 border-t border-[#C9D0C6]">
-              <div>
-                <span className="font-mono text-xs font-semibold text-[#23645A] block mb-2">01 / DISCRIMINATION GAP</span>
-                <p className="text-xs text-[#4D5D57] leading-relaxed">
-                  Held-out random splits share underlying sampling biases and measurement conventions. External validation reveals how much predictive capacity is cohort-specific.
-                </p>
-              </div>
-              <div>
-                <span className="font-mono text-xs font-semibold text-[#23645A] block mb-2">02 / PREVALENCE REALITY</span>
-                <p className="text-xs text-[#4D5D57] leading-relaxed">
-                  At 4-5% stroke prevalence, ROC-AUC gives undue credit for identifying true negatives. PR-AUC reveals whether minority stroke events can actually be prioritised.
-                </p>
-              </div>
-              <div>
-                <span className="font-mono text-xs font-semibold text-[#23645A] block mb-2">03 / PROBABILITY FIDELITY</span>
-                <p className="text-xs text-[#4D5D57] leading-relaxed">
-                  Clinical action requires trustworthy probabilities. A model with acceptable discrimination may still output probabilities that are systematically misleading.
-                </p>
-              </div>
-            </div>
+          <div className="space-y-5">
+            <p className="text-lg text-[#111816] font-serif-heading leading-snug">
+              Most clinical machine learning models are evaluated on randomly held-out test splits from the same underlying dataset on which they were developed.
+            </p>
+            <p>
+              While this validates internal statistical consistency, it fails to evaluate generalisation across real-world hospital boundaries. In clinical deployment, models face patients recruited under distinct inclusion criteria, demographic distributions, and laboratory assay protocols.
+            </p>
+            <p>
+              This investigation evaluates whether three standard risk architectures (Logistic Regression, Random Forest, and XGBoost) trained on the widely benchmarked Kaggle Stroke Dataset maintain discrimination and calibration when deployed against the CDC NHANES 2021-2023 cohort.
+            </p>
           </div>
 
-          {/* Sidebar Note */}
-          <div className="lg:col-span-4 lg:pl-6 lg:border-l lg:border-[#C9D0C6] flex flex-col justify-start">
-            <div className="bg-[#FCFBF7] border border-[#C9D0C6] p-6 rounded-xs">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-[#4D5D57] block mb-3">
-                Research Thesis
+          <div className="space-y-5">
+            <div className="border-l-2 border-[#1B5E54] pl-5 py-1">
+              <span className="font-mono text-xs text-[#1B5E54] font-semibold uppercase tracking-wider block mb-1">
+                THE EMPIRICAL PARADOX
               </span>
-              <blockquote className="font-serif-heading text-xl sm:text-2xl text-[#172B29] leading-snug mb-4">
-                "Same model. Different data-generating process. A more demanding test."
-              </blockquote>
-              <p className="text-xs text-[#4D5D57] leading-relaxed">
-                We treat this as an empirical research question being tested across datasets, rather than an assertion that all published stroke models necessarily fail. The goal is transparent measurement of degradation.
+              <p className="text-[#111816] text-base leading-relaxed">
+                A model can show high in-domain discrimination (ROC-AUC 0.838) yet experience an immediate 63% collapse in precision-recall retrieval and catastrophic probability distortion the moment it crosses institutional boundaries.
               </p>
             </div>
+            <p>
+              Crucially, this failure is not merely a reflection of differing disease prevalence. Through two-sample Kolmogorov-Smirnov tests, Population Stability Index (PSI), and counterfactual feature-patching experiments, we establish that the degradation is driven by concurrent covariate shift and underlying concept shift.
+            </p>
+            <p className="font-mono text-xs text-[#9AA39E] pt-2">
+              Cohort sizes: Source N = 5,108 (3,576 train / 1,533 test) · Target N = 3,167 independent survey participants.
+            </p>
           </div>
 
         </div>

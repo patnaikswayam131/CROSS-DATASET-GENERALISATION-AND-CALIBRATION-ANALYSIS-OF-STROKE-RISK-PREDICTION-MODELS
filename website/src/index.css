@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 /* ============================================================
-   DESIGN TOKENS - Editorial Research Note Style
-   Strictly following DESIGN (1).md
+   DESIGN TOKENS - Minimal, Spacious Scientific Editorial Style
    No em dashes used.
+   Clean, open, de-boxed, glare-free archival aesthetics.
    ============================================================ */
 @theme {
-  --color-paper: #F5F3EB;
-  --color-surface: #FCFBF7;
-  --color-ink: #172B29;
-  --color-muted-ink: #4D5D57;
-  --color-source-green: #23645A;
-  --color-target-rust: #994524;
-  --color-line: #C9D0C6;
-  --color-soft-green: #E6ECE4;
-  --color-soft-rust: #F3E6DE;
+  --color-paper: #FAF9F5;
+  --color-surface: #FFFFFF;
+  --color-ink: #111816;
+  --color-muted-ink: #55635E;
+  --color-source-green: #1B5E54;
+  --color-target-rust: #A33B20;
+  --color-line: #E2E0D8;
+  --color-soft-green: #EDF3F0;
+  --color-soft-rust: #FAF0EC;
   --color-focus: #1D6ED8;
-  --color-chart-neutral: #858E88;
+  --color-chart-neutral: #9AA39E;
 
   --font-display: "Newsreader", Georgia, "Times New Roman", serif;
   --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -24,17 +24,17 @@
 }
 
 :root {
-  --paper: #F5F3EB;
-  --surface: #FCFBF7;
-  --ink: #172B29;
-  --muted-ink: #4D5D57;
-  --source-green: #23645A;
-  --target-rust: #994524;
-  --line: #C9D0C6;
-  --soft-green: #E6ECE4;
-  --soft-rust: #F3E6DE;
+  --paper: #FAF9F5;
+  --surface: #FFFFFF;
+  --ink: #111816;
+  --muted-ink: #55635E;
+  --source-green: #1B5E54;
+  --target-rust: #A33B20;
+  --line: #E2E0D8;
+  --soft-green: #EDF3F0;
+  --soft-rust: #FAF0EC;
   --focus: #1D6ED8;
-  --chart-neutral: #858E88;
+  --chart-neutral: #9AA39E;
 
   --font-display: "Newsreader", Georgia, "Times New Roman", serif;
   --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -73,9 +73,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Apple-style spring interaction utility */
 .btn-tactile {
-  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  transition: transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease;
 }
 
 .btn-tactile:hover {
@@ -83,7 +82,7 @@ html {
 }
 
 .btn-tactile:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 body {
@@ -91,7 +90,7 @@ body {
   padding: 0;
   font-family: var(--font-body);
   font-weight: 400;
-  line-height: 1.65;
+  line-height: 1.7;
   color: var(--ink);
   background-color: var(--paper);
   font-feature-settings: "kern" 1, "liga" 1;
@@ -102,7 +101,7 @@ h1, h2, h3, h4, .font-serif-heading {
   font-family: var(--font-display);
   color: var(--ink);
   font-feature-settings: "liga" 1;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.015em;
 }
 
@@ -120,7 +119,7 @@ code, pre, .mono, [data-mono] {
   outline-offset: 2px;
 }
 
-/* Reduced motion technique C39 */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -143,8 +142,8 @@ code, pre, .mono, [data-mono] {
 
 /* Custom understated scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -152,19 +151,18 @@ code, pre, .mono, [data-mono] {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D0D6CD;
-  border-radius: 3px;
+  background: #D8D6CE;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #A9B3A7;
+  background: #B6B3AA;
 }
 
 /* ============================================================
-   EDITORIAL STRUCTURE & UTILITIES
+   MINIMAL EDITORIAL STRUCTURE & BOOKTABS
    ============================================================ */
 
-/* Fine editorial horizontal line */
 .editorial-rule {
   border: 0;
   border-top: 1px solid var(--line);
@@ -172,96 +170,59 @@ code, pre, .mono, [data-mono] {
   width: 100%;
 }
 
-/* Section label formatting */
 .editorial-label {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--source-green);
 }
 
-/* Academic reading surface */
-.reading-surface {
-  background-color: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 2px;
-}
-
-/* Callout note with restrained border */
-.editorial-callout {
-  background-color: var(--surface);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--source-green);
-  padding: 1rem 1.25rem;
-  border-radius: 0 2px 2px 0;
-}
-
-.editorial-callout-warning {
-  border-left-color: var(--target-rust);
-}
-
-/* Academic data table styling */
-.academic-table {
+/* Tufte Booktabs Style Table: Clean, no vertical rules, generous row padding */
+.booktabs-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-.academic-table th {
+.booktabs-table th {
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 0.775rem;
-  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--muted-ink);
-  padding: 0.75rem 0.875rem;
+  padding: 0.85rem 1rem;
   text-align: left;
-  border-bottom: 2px solid var(--line);
-  background-color: #EFECE1;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
+  background-color: transparent;
 }
 
-.academic-table td {
-  padding: 0.75rem 0.875rem;
+.booktabs-table td {
+  padding: 0.85rem 1rem;
   border-bottom: 1px solid var(--line);
   color: var(--ink);
   font-family: var(--font-mono);
   font-size: 0.825rem;
 }
 
-.academic-table td.text-col {
+.booktabs-table td.text-col {
   font-family: var(--font-body);
   font-size: 0.875rem;
 }
 
-.academic-table tbody tr:hover {
-  background-color: #F8F6EE;
+.booktabs-table tr:last-child td {
+  border-bottom: 1px solid var(--ink);
 }
 
-/* Responsive table container */
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border: 1px solid var(--line);
+.booktabs-table tbody tr:hover {
+  background-color: rgba(27, 94, 84, 0.02);
 }
 
-/* Recharts / SVG axis styling */
-.recharts-cartesian-axis-tick-value,
-.chart-axis-text {
-  fill: var(--muted-ink) !important;
-  font-family: var(--font-mono) !important;
-  font-size: 0.75rem !important;
-}
-
-.recharts-legend-item-text {
-  color: var(--ink) !important;
-  font-family: var(--font-body) !important;
-  font-size: 0.8rem !important;
-}
-
-.recharts-tooltip-wrapper {
-  outline: none !important;
+/* Range slider styling */
+input[type="range"] {
+  accent-color: var(--source-green);
 }

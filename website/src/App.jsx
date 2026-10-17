@@ -65,7 +65,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F3EB] text-[#172B29] font-sans antialiased selection:bg-[#E6ECE4] selection:text-[#172B29] relative">
+    <div className="min-h-screen bg-[#FAF9F5] text-[#111816] font-sans antialiased selection:bg-[#EDF3F0] selection:text-[#111816] relative">
       {/* 1. Masthead Navigation */}
       <SiteHeader />
 
@@ -110,14 +110,14 @@ function App() {
       {/* 14. Colophon / Footer */}
       <SiteFooter />
 
-      {/* Apple-style Tactile Back-to-Top Button */}
+      {/* Tactile Back-to-Top Button */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-40 p-2.5 bg-[#FCFBF7] border border-[#C9D0C6] text-[#172B29] hover:bg-[#E6ECE4] rounded-xs shadow-[0_4px_16px_rgba(23,43,41,0.08)] btn-tactile cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D6ED8]"
+          className="fixed bottom-6 right-6 z-40 p-2 bg-white border border-[#E2E0D8] text-[#111816] hover:bg-[#FAF9F5] rounded-xs shadow-[0_2px_8px_rgba(0,0,0,0.04)] btn-tactile cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#1D6ED8]"
           aria-label="Back to top"
         >
-          <ArrowUp className="w-4 h-4" />
+          <ArrowUp className="w-3.5 h-3.5" />
         </button>
       )}
     </div>

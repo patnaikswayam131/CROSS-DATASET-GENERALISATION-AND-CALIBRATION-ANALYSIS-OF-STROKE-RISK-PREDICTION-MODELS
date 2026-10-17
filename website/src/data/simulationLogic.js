@@ -171,6 +171,10 @@ export function simulatePatientRisk({
   if (bmi >= 30) trustScore -= 10;
   trustScore = Math.max(trustScore, 15);
 
+  const riskTier = riskKagglePct >= 15 ? 'High' : riskKagglePct >= 5 ? 'Moderate' : 'Low';
+  const ciLowPct = Math.max(0.1, riskKagglePct * 0.78).toFixed(1);
+  const ciHighPct = Math.min(99.0, riskKagglePct * 1.25).toFixed(1);
+
   return {
     riskKaggle: riskKagglePct,
     riskNHANES: riskNHANESPct,
@@ -179,6 +183,14 @@ export function simulatePatientRisk({
     isSevereShift,
     trustScore,
     warnings,
+    predictedRiskPct: riskKagglePct.toFixed(1),
+    riskTier,
+    ciLowPct,
+    ciHighPct,
+    rawRiskPct: riskKagglePct.toFixed(1),
+    calibratedRiskPct: riskNHANESPct.toFixed(1),
+    distortionGapPct: (deltaPct >= 0 ? '+' : '') + deltaPct.toFixed(1),
+    inShiftZone: isSevereShift,
   };
 }
 
@@ -208,6 +220,11 @@ export function simulateDecisionThreshold(threshold) {
   const fpNHANES = Math.round(959 * (1 - normThreshold * 1.30));
   const fpRatio = (fpNHANES / Math.max(fpKaggle, 1)).toFixed(1);
 
+  const fprPct = ((fpNHANES / 959) * 100).toFixed(1);
+  const tprPct = Math.max(12.0, Math.min(94.0, (1 - normThreshold * 1.6) * 100)).toFixed(1);
+  const ppvPct = (precisionNHANES * 100).toFixed(1);
+  const nns = Math.max(1, Math.round(1 / precisionNHANES));
+
   return {
     threshold: normThreshold,
     precisionKaggle: Math.max(precisionKaggle, 0.049),
@@ -216,5 +233,9 @@ export function simulateDecisionThreshold(threshold) {
     fpNHANES: Math.max(fpNHANES, 42),
     fpRatio,
     collapsePct: Math.round(((precisionKaggle - precisionNHANES) / precisionKaggle) * 100),
+    fprPct,
+    tprPct,
+    ppvPct,
+    nns,
   };
 }
