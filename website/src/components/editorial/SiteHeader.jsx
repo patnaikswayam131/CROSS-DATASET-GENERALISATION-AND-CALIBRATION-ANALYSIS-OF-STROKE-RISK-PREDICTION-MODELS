@@ -134,20 +134,30 @@ export default function SiteHeader() {
               <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${moreDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* Dropdown Popover */}
+            {/* Dropdown Popover: 2-column layout (fits all 10 chapters comfortably with zero scroll needed, and data-lenis-prevent enabled) */}
             {moreDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-72 bg-white border border-[#E2E0D8] rounded-xs shadow-lg py-1.5 z-50 divide-y divide-[#F0EFEA]">
-                <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-[#9AA39E] font-semibold bg-[#FAF9F5]">
-                  Full Chapter Index
+              <div
+                data-lenis-prevent="true"
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+                className="absolute right-0 mt-2 w-[340px] sm:w-[480px] bg-white border border-[#E2E0D8] rounded-xs shadow-xl py-2 z-50 divide-y divide-[#F0EFEA]"
+              >
+                <div className="px-4 py-1.5 flex items-center justify-between text-[10px] uppercase tracking-wider text-[#9AA39E] font-semibold bg-[#FAF9F5]">
+                  <span>Full Chapter Index</span>
+                  <span className="text-[#1B5E54] font-mono">10 Modules</span>
                 </div>
-                <div className="py-1 max-h-80 overflow-y-auto">
+                
+                <div
+                  data-lenis-prevent="true"
+                  className="p-2 grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-[75vh] sm:max-h-none overflow-y-auto"
+                >
                   {NAV_ITEMS.map((item) => {
                     const isActive = activeSection === item.id;
                     return (
                       <button
                         key={item.id}
                         onClick={() => scrollTo(item.id)}
-                        className={`w-full text-left px-3 py-2 flex items-start gap-2.5 transition-colors cursor-pointer ${
+                        className={`text-left px-3 py-2 rounded-xs flex items-start gap-2.5 transition-colors cursor-pointer ${
                           isActive
                             ? 'bg-[#EDF3F0] text-[#1B5E54] font-medium'
                             : 'hover:bg-[#FAF9F5] text-[#111816]'
@@ -195,7 +205,12 @@ export default function SiteHeader() {
 
       {/* Mobile / Tablet Collapsible Menu */}
       {mobileMenuOpen && (
-        <div className="border-b border-[#E2E0D8] bg-[#FAF9F5] px-4 sm:px-6 py-4 shadow-inner">
+        <div
+          data-lenis-prevent="true"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+          className="border-b border-[#E2E0D8] bg-[#FAF9F5] px-4 sm:px-6 py-4 shadow-inner max-h-[80vh] overflow-y-auto"
+        >
           <div className="text-[10px] font-mono uppercase tracking-wider text-[#9AA39E] font-semibold mb-2">
             Table of Contents
           </div>
